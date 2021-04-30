@@ -1,3 +1,39 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-# Create your models here.
+
+class Beer(models.Model):
+
+    name = models.CharField(null=True, max_length=50)
+    brewery = models.CharField(blank=True, max_length=50)
+
+    def __str__(self):
+        return f'{self.brewery} - {self.name}'
+
+
+class Venue(models.Model):
+
+    name = models.CharField(null=True, max_length=50)
+    location = models.CharField(null=True, max_length=50)
+
+    def __str__(self):
+        return f'{self.name} - {self.location}'
+
+
+class Rating(models.Model):
+    MIN = 0
+    MAX = 10
+
+    SERVING_SIZES = [('Pint', 'Pint'), ('Schooner', 'Schooner'), ('Half-Pint', 'Half-Pint'), ('1/3 Pint', '1/3 Pint')]
+
+    beer = models.ForeignKey(Beer, null=True, on_delete=models.CASCADE)
+    venue = models.ForeignKey(Venue, null=True, on_delete=models.CASCADE)
+    serving_size = models.CharField(null=True, choices=SERVING_SIZES, max_length=10)
+    price = models.FloatField(null=True, blank=True)
+    submitted_by = models.CharField(null=True, default='Anonymous User', max_length=20)
+    rating = models.FloatField(null=True, validators=[MinValueValidator(MIN), MaxValueValidator(MAX)])
+
+    def __str__(self):
+        return f'{self.beer}{self.venue}{self.serving_size}{self.rating}'
+
+
