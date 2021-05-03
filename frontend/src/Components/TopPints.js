@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function Home() {
+export default function TopPints() {
 
   const classes = useStyles();
 
@@ -19,13 +19,9 @@ export default function Home() {
               <Grid container>
                     <Paper elevation={3}>
                         <Grid item xs={4} style={{marginLeft: 20, }}>
-                            <Typography>Not all pints are created equal. The same delicious beer can taste completely
-                                        different depending on venue. Rate my beer give people the chance to for the
-                                        people to have their say on their favourite pint and the venues that serve them.
+                            <Typography>TOP PINTS M9
                             </Typography>
-
                         </Grid>
-
                     </Paper>
               </Grid>
         </Box>
