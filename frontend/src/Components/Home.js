@@ -17,7 +17,7 @@ export default function Home() {
     <div className={classes.root}>
         <Box m={3}>
               <Grid container>
-                    <Paper elevation={3}>
+                    <Paper elevation={1}>
                         <Grid item xs={4} style={{marginLeft: 20, }}>
                             <Typography>Not all pints are created equal. The same delicious beer can taste completely
                                         different depending on venue. Rate my beer give people the chance to for the

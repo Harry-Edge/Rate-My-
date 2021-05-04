@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid'
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
-import {BrowserRouter as Router, Switch, Route, Link, useHistory} from 'react-router-dom'
+import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom'
 import Home from "./Home";
 import TopPints from "./TopPints";
 
@@ -19,7 +19,6 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         justifyContent: 'center',
         paddingTop: 5
-
     },
     navMenuItem:{
         '&:hover': {
@@ -30,7 +29,9 @@ const useStyles = makeStyles((theme) => ({
     addEntryButton: {
         color: 'white',
         textTransform: 'none',
-        width: '100%',
+
+        width: '90%',
+        float: 'right',
         fontWeight: 650,
         backgroundColor: '#009933',
         borderColor: '#009933',
@@ -42,10 +43,9 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function MainNavigation(props) {
+export default function MainNavigation() {
 
   const [currentPage, setCurrentPage] = useState('home');
-
 
   const classes = useStyles();
 
@@ -60,7 +60,6 @@ export default function MainNavigation(props) {
                                  style={currentPage === 'home' ? {backgroundColor: '#f2f2f2'} : null}>
                                <Link className={classes.navMenuItemsText} to='/'>Home</Link>
                            </Grid>
-
                            <Grid item xs={2}
                                  className={classes.navMenuItem}
                                  onClick={() => setCurrentPage('topPints')}
@@ -94,5 +93,4 @@ export default function MainNavigation(props) {
             </Switch>
         </Router>
       );
-
 }
