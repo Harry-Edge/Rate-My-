@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography';
@@ -13,6 +13,7 @@ export default function Home() {
 
   const classes = useStyles();
 
+
   return (
     <div className={classes.root}>
         <Box m={3}>
@@ -23,9 +24,7 @@ export default function Home() {
                                         different depending on venue. Rate my beer give people the chance to for the
                                         people to have their say on their favourite pint and the venues that serve them.
                             </Typography>
-
                         </Grid>
-
                     </Paper>
               </Grid>
         </Box>
