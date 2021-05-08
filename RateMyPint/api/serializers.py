@@ -7,3 +7,9 @@ class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = ('id', 'beer', 'venue', 'serving_size', 'price', 'submitted_by', 'rating')
+
+
+class VenueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Venue
+        fields = ('id', 'name', 'location')

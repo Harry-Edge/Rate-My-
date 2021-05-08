@@ -1,0 +1,10 @@
+.progressLoader {
+   color: aqua;
+   position: relative;
+   marginTop: 20px;
+   marginLeft: 45%;
+}
+
+.test {
+    color: aqua;
+}

@@ -3,5 +3,7 @@ from django.urls import path, include
 from .views import *
 
 urlpatterns = [
-    path('top-pints', TopPints.as_view())
+    path('top-pints', TopPints.as_view()),
+    path('get-top-rated-pints-in-area', GetTopRatedPintsInArea.as_view()),
+    path('search-location', SearchLocations.as_view())
 ]

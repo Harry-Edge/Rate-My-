@@ -7,6 +7,8 @@ import Button from '@material-ui/core/Button'
 import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom'
 import Home from "./Home";
 import TopPints from "./TopPints";
+import About from "./About";
+import Venues from "./Venues";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -18,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
         textDecoration: 'none',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 5
+        paddingTop: 7
     },
     navMenuItem:{
         '&:hover': {
@@ -56,31 +58,33 @@ export default function MainNavigation() {
                        <Grid container>
                            <Grid item xs={2}
                                  className={classes.navMenuItem}
-                                 onClick={() => setCurrentPage('home')}
-                                 style={currentPage === 'home' ? {backgroundColor: '#f2f2f2'} : null}>
-                               <Link className={classes.navMenuItemsText} to='/'>Home</Link>
+                                 style={window.location.pathname === '/' ? {backgroundColor: '#f2f2f2'} : null}>
+                               <Link onClick={() => setCurrentPage('home')}
+                                     className={classes.navMenuItemsText} to='/'>Home</Link>
                            </Grid>
                            <Grid item xs={2}
                                  className={classes.navMenuItem}
-                                 onClick={() => setCurrentPage('topPints')}
-                                 style={currentPage === 'topPints' ? {backgroundColor: '#f2f2f2'} : null}>
-                                <Link className={classes.navMenuItemsText} to='/top-pints'>Top Pints</Link>
+                                 style={window.location.pathname === '/top-pints' ? {backgroundColor: '#f2f2f2'} : null}>
+                                <Link onClick={() => setCurrentPage('topPints')}
+                                      className={classes.navMenuItemsText} to='/top-pints'>Top Pints</Link>
                            </Grid>
                             <Grid item xs={2}
-                                  className={classes.navMenuItem}>
-                               <Typography className={classes.navMenuItemsText}>Locations</Typography>
+                                  className={classes.navMenuItem}
+                                  style={window.location.pathname === '/venues' ? {backgroundColor: '#f2f2f2'} : null}>
+                                 <Link onClick={() => setCurrentPage('venues')}
+                                     className={classes.navMenuItemsText} to='/venues'>Locations</Link>
+
                            </Grid>
-                            <Grid item xs={2} className={classes.navMenuItem}>
-                               <Typography className={classes.navMenuItemsText}>Venues</Typography>
+                            <Grid item xs={2}
+                                  className={classes.navMenuItem}
+                                  style={window.location.pathname === '/about' ? {backgroundColor: '#f2f2f2'} : null}>
+                                  <Link onClick={() => setCurrentPage('about')}
+                                     className={classes.navMenuItemsText} to='/about'>About</Link>
                            </Grid>
-                            <Grid item xs={2} className={classes.navMenuItem}>
-                               <Typography className={classes.navMenuItemsText}>About</Typography>
-                           </Grid>
-                            <Grid item xs={2}>
+                            <Grid item xs={4}>
                                <Button className={classes.addEntryButton}>Add Pint Entry</Button>
                            </Grid>
                        </Grid>
-                     <br/>
                 </Box>
             </div>
             <Switch>
@@ -89,6 +93,12 @@ export default function MainNavigation() {
                 </Route>
                 <Route exact path='/top-pints'>
                     <TopPints/>
+                </Route>
+                <Route exact path='/venues'>
+                    <Venues/>
+                </Route>
+                <Route exact path='/about'>
+                    <About/>
                 </Route>
             </Switch>
         </Router>
