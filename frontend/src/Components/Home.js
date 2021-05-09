@@ -13,7 +13,8 @@ import ExploreIcon from '@material-ui/icons/Explore';
 import usePlaceAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
 import {Combobox, ComboboxInput, ComboboxPopover,
         ComboboxList, ComboboxOption, ComboboxOptionText} from "@reach/combobox";
-import "@reach/combobox/styles.css"
+import "@reach/combobox/styles.css";
+import Geocode from 'react-geocode';
 
 const useStyles = makeStyles((theme) => ({
     topPintsAreaText: {
@@ -102,7 +103,7 @@ export default function Home() {
 
   function getTopRatedPints(location) {
       setTimeout(() => {
-          setCurrentLocation(location)
+          //setCurrentLocation(location)
           const requestOptions = {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
@@ -113,7 +114,7 @@ export default function Home() {
               .then((data) => {
                   setTopRatedPintsInArea(data)
               })
-      }, 100)
+      }, 1)
     }
 
   const {isLoaded} = useLoadScript(
@@ -143,10 +144,14 @@ export default function Home() {
                 <br/>
                 <Grid container spacing={2}>
                     <Grid item lg={12} md={12} sm={12}>
-                        <Search panTo={panTo} getTopRatedPints={getTopRatedPints}/>
+                        <Search panTo={panTo} getTopRatedPints={getTopRatedPints}
+                                              currentLocation={currentLocation}
+                                              setCurrentLocation={setCurrentLocation}/>
                     </Grid>
                     <Grid item lg={8} md={12} sm={12}>
-                        <Locate panTo={panTo} getTopRatedPints={getTopRatedPints}/>
+                        <Locate panTo={panTo} getTopRatedPints={getTopRatedPints}
+                                              currentLocation={currentLocation}
+                                              setCurrentLocation={setCurrentLocation}/>
                         <Paper elevation={3}>
                             <div style={{width: '40w', height: '60vh'}}>
                                 {
@@ -198,9 +203,18 @@ function Locate(props) {
     const classes = useStyles()
 
     return <ExploreIcon className={classes.locate} onClick={() => {
-        navigator.geolocation.getCurrentPosition((position) => {
+        navigator.geolocation.getCurrentPosition(async (position) => {
             console.log(position)
-            props.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
+            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
+
+            await Geocode.fromLatLng(position.coords.latitude, position.coords.longitude)
+                .then((response) => {
+                    props.setCurrentLocation(response.results[0].address_components[2].long_name)
+                    props.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
+                    props.getTopRatedPints(response.results[0].address_components[2].long_name)
+                }, error => {console.error(error)})
+
+
         }, () => null,)}
     }/>
 }
@@ -218,6 +232,11 @@ function Search(props){
                         clearSuggestions()
                         try {
                             const results = await getGeocode({address})
+                            console.log('address', address)
+                            console.log('results', results)
+
+                            await props.setCurrentLocation(results[0].address_components[0].long_name)
+
                             const {lat, lng} = await getLatLng(results[0])
                             props.panTo({lat, lng})
                             props.getTopRatedPints(results[0].address_components[0].long_name)
