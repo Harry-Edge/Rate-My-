@@ -61,6 +61,8 @@ const useStyles = makeStyles((theme) => ({
 
 const libraries = ['places']
 
+Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
+
 export default function Home() {
 
   const classes = useStyles();
@@ -70,7 +72,6 @@ export default function Home() {
 
   const mapRef = React.useRef()
   const onMapLoad = React.useCallback((map) => {
-      console.log(map)
       mapRef.current = map
   }, [])
 
@@ -80,13 +81,19 @@ export default function Home() {
     }, [])
 
 
-  useEffect(() => {
-      navigator.geolocation.getCurrentPosition(async function (position){
+  useEffect( async () => {
+        await navigator.geolocation.getCurrentPosition(function (position){
           const lat = position.coords.latitude
           const lng = position.coords.longitude
           setTimeout(() => {
-            panTo({lat, lng})}, 500)
-      })
+             Geocode.fromLatLng(lat, lng)
+                .then((response) => {
+                    setCurrentLocation(response.results[0].address_components[2].long_name)
+                    panTo({lat: position.coords.latitude, lng: position.coords.longitude})
+                    if(response.results[0].address_components[2].long_name){
+                        getTopRatedPints(response.results[0].address_components[2].long_name)
+                    }
+                }, error => {console.error(error)})}, 200)})
       const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'} ,
@@ -96,7 +103,6 @@ export default function Home() {
       fetch("http://127.0.0.1:8000/api/get-top-rated-pints-in-area", requestOptions)
          .then((response) => response.json())
          .then((data) => {
-             console.log(data)
              setTopRatedPintsInArea(data)
          })
   }, [])
@@ -203,17 +209,13 @@ function Locate(props) {
     const classes = useStyles()
 
     return <ExploreIcon className={classes.locate} onClick={() => {
-        navigator.geolocation.getCurrentPosition(async (position) => {
-            console.log(position)
-            Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
-
-            await Geocode.fromLatLng(position.coords.latitude, position.coords.longitude)
+        navigator.geolocation.getCurrentPosition( (position) => {
+            Geocode.fromLatLng(position.coords.latitude, position.coords.longitude)
                 .then((response) => {
                     props.setCurrentLocation(response.results[0].address_components[2].long_name)
                     props.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
                     props.getTopRatedPints(response.results[0].address_components[2].long_name)
                 }, error => {console.error(error)})
-
 
         }, () => null,)}
     }/>
@@ -222,7 +224,7 @@ function Locate(props) {
 function Search(props){
 
     const {ready, value, suggestions: {status, data}, setValue, clearSuggestions} = usePlaceAutocomplete({
-        requestOptions: {location: {lat: () => 53.480759, lng: () => -2.242631},
+        requestOptions: {location: {lat: () => 53.480759, lng: () => -2.242631}, // auto complete based on users location
                         radius: 400}
     })
 
@@ -232,11 +234,7 @@ function Search(props){
                         clearSuggestions()
                         try {
                             const results = await getGeocode({address})
-                            console.log('address', address)
-                            console.log('results', results)
-
                             await props.setCurrentLocation(results[0].address_components[0].long_name)
-
                             const {lat, lng} = await getLatLng(results[0])
                             props.panTo({lat, lng})
                             props.getTopRatedPints(results[0].address_components[0].long_name)

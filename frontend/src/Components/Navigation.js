@@ -9,6 +9,7 @@ import Home from "./Home";
 import TopPints from "./TopPints";
 import About from "./About";
 import Venues from "./Venues";
+import AddPintEntry from "./AddPintEntry";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -49,6 +50,13 @@ export default function MainNavigation() {
 
   const [currentPage, setCurrentPage] = useState('home');
 
+  const [open, setOpen] = useState(false)
+
+
+  function closeAddPint() {
+      setOpen(false)
+  }
+
   const classes = useStyles();
 
   return (
@@ -82,7 +90,8 @@ export default function MainNavigation() {
                                      className={classes.navMenuItemsText} to='/about'>About</Link>
                            </Grid>
                             <Grid item xs={4}>
-                               <Button className={classes.addEntryButton}>Add Pint Entry</Button>
+                               <Button className={classes.addEntryButton}
+                                       onClick={() => setOpen(true)} >Add Pint Entry</Button>
                            </Grid>
                        </Grid>
                 </Box>
@@ -101,6 +110,10 @@ export default function MainNavigation() {
                     <About/>
                 </Route>
             </Switch>
+            {
+                open ?
+                    <AddPintEntry open={open} close={closeAddPint}/> : null
+            }
         </Router>
       );
 }
