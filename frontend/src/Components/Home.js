@@ -25,6 +25,10 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         paddingTop: 7
     },
+    topPintsTable: {
+       height: 450,
+       overflow: 'scroll',
+    },
     listItemText: {
         fontSize: 10
     },
@@ -75,25 +79,37 @@ export default function Home() {
       mapRef.current = map
   }, [])
 
-  const panTo = React.useCallback(({lat, lng}) => {
-      mapRef.current.panTo({lat, lng})
-      mapRef.current.setZoom(14)
+  const panTo = React.useCallback(({lat, lng, panLvl}) => {
+      setTimeout(() => {
+                mapRef.current.panTo({lat, lng})
+                mapRef.current.setZoom(panLvl)
+      }, 300)
+
     }, [])
 
 
   useEffect( async () => {
-        await navigator.geolocation.getCurrentPosition(function (position){
-          const lat = position.coords.latitude
-          const lng = position.coords.longitude
-          setTimeout(() => {
-             Geocode.fromLatLng(lat, lng)
-                .then((response) => {
-                    setCurrentLocation(response.results[0].address_components[2].long_name)
-                    panTo({lat: position.coords.latitude, lng: position.coords.longitude})
-                    if(response.results[0].address_components[2].long_name){
-                        getTopRatedPints(response.results[0].address_components[2].long_name)
-                    }
-                }, error => {console.error(error)})}, 200)})
+
+        function success(position) {
+              const lat = position.coords.latitude
+              const lng = position.coords.longitude
+              setTimeout(() => {
+                 Geocode.fromLatLng(lat, lng)
+                    .then((response) => {
+                        setCurrentLocation(response.results[0].address_components[2].long_name)
+                        panTo({lat: position.coords.latitude, lng: position.coords.longitude, panLvl:14})
+                        if(response.results[0].address_components[2].long_name){
+                            getTopRatedPints(response.results[0].address_components[2].long_name)
+                        }
+                    }, error => {console.error(error)})}, 200)
+        }
+        function error(){
+            // Map pans to a view of the whole of the UK if location is denied by the user
+            panTo({lat: 54.071960, lng: -2.864030, panLvl:6})
+        }
+
+        await navigator.geolocation.getCurrentPosition(success, error)
+
       const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'} ,
@@ -145,7 +161,7 @@ export default function Home() {
   return (
     <div className={classes.root}>
         {topRatedPintsInArea ?
-            <Box m={3}>
+            <Box>
                 <Divider/>
                 <br/>
                 <Grid container spacing={2}>
@@ -159,7 +175,7 @@ export default function Home() {
                                               currentLocation={currentLocation}
                                               setCurrentLocation={setCurrentLocation}/>
                         <Paper elevation={3}>
-                            <div style={{width: '40w', height: '60vh'}}>
+                            <div style={{width: '100%', height: '60vh'}}>
                                 {
                                     isLoaded ?
                                         <GoogleMap mapContainerStyle={mapContainerStyle}
@@ -174,8 +190,9 @@ export default function Home() {
                     <Grid item lg={4} md={12} sm={12}>
                         <Paper style={{height: '60vh'}}>
                             <Typography
-                                className={classes.topPintsAreaText}>{`Top Rated Pints In ${currentLocation}`}</Typography>
-                            <List dense={true}>
+                                className={classes.topPintsAreaText}>
+                                {currentLocation ?`Top Rated Pints In ${currentLocation}` : "Search Above to View the Best Pints"}</Typography>
+                            <List dense={true} className={classes.topPintsTable}>
                                 {
                                     topRatedPintsInArea.length ?
                                         topRatedPintsInArea.map((entry, index) => {
@@ -189,7 +206,7 @@ export default function Home() {
                                                 </ListItem>
                                             )
                                         }) : <Typography style={{display: 'flex', justifyContent: 'center'}}
-                                                         >No user submissions yet... </Typography>
+                                                         >{currentLocation ? "No user submissions yet..." : null} </Typography>
                                 }
                             </List>
                         </Paper>
@@ -213,7 +230,7 @@ function Locate(props) {
             Geocode.fromLatLng(position.coords.latitude, position.coords.longitude)
                 .then((response) => {
                     props.setCurrentLocation(response.results[0].address_components[2].long_name)
-                    props.panTo({lat: position.coords.latitude, lng: position.coords.longitude})
+                    props.panTo({lat: position.coords.latitude, lng: position.coords.longitude, panLvl: 14})
                     props.getTopRatedPints(response.results[0].address_components[2].long_name)
                 }, error => {console.error(error)})
 
@@ -228,24 +245,26 @@ function Search(props){
                         radius: 400}
     })
 
-    return <div>
-            <Combobox onSelect={ async (address) => {
-                        setValue(address, false);
-                        clearSuggestions()
-                        try {
-                            const results = await getGeocode({address})
-                            await props.setCurrentLocation(results[0].address_components[0].long_name)
-                            const {lat, lng} = await getLatLng(results[0])
-                            props.panTo({lat, lng})
-                            props.getTopRatedPints(results[0].address_components[0].long_name)
+    const handleSelect = async (address) => {
+        setValue(address, false);
+        clearSuggestions()
+        try {
+            const results = await getGeocode({address})
+            await props.setCurrentLocation(results[0].address_components[0].long_name)
+            const {lat, lng} = await getLatLng(results[0])
+            props.panTo({lat: lat, lng: lng, panLvl: 14})
+            props.getTopRatedPints(results[0].address_components[0].long_name)
+        }catch (error){
+            console.log("Error:", error)
+        }
+    }
 
-                        }catch (error){
-                            console.log("Error:", error)
-                        }}}>
+    return <div>
+            <Combobox onSelect={handleSelect}>
                     <ComboboxInput value={value} onChange={(e) => {
                         setValue(e.target.value)}}
                         disabled={!ready}
-                        style={{width: '99.5%', height: 30, fontSize: 20}}
+                        style={{width: '99.5%', height: 50, fontSize: 20, borderStyle: 'solid', borderColor: 'grey'}}
                         placeholder=" Search City"/>
                     <ComboboxPopover>
                         <ComboboxList>

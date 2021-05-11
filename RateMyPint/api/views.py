@@ -26,7 +26,7 @@ class TopPints(APIView):
             serialized_data['location'] = beer_entry.venue.location
             top_list.append(serialized_data)
 
-        return Response(top_list, status=status.HTTP_200_OK)
+        return Response(top_list * 4, status=status.HTTP_200_OK)
 
 
 class GetTopRatedPintsInArea(APIView):
@@ -54,7 +54,9 @@ class GetTopRatedPintsInArea(APIView):
                 serialized_data['location'] = beer_entry.venue.location
                 top_list.append(serialized_data)
 
-            return Response(top_list, status=status.HTTP_200_OK)
+            print(top_list)
+
+            return Response(top_list * 5, status=status.HTTP_200_OK)
         return Response('Bad Request', status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -79,9 +81,8 @@ class SearchLocations(APIView):
                 serialized_data['location'] = beer_entry.venue.location
                 top_list.append(serialized_data)
 
-            return Response(top_list, status=status.HTTP_200_OK)
+            return Response(top_list * 3, status=status.HTTP_200_OK)
         return Response('Bad Request', status=status.HTTP_400_BAD_REQUEST)
-
 
 
 

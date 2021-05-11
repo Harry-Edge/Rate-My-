@@ -78,7 +78,7 @@ export default function Header() {
               <SearchIcon />
             </div>
             <InputBase
-              placeholder="Search Beer…"
+              placeholder="Search..."
               classes={{
                 root: classes.inputRoot,
                 input: classes.inputInput,

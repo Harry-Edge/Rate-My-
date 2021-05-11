@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box'
 import Grid from "@material-ui/core/Grid";
-import {Paper} from "@material-ui/core";
+import {Divider, Paper} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import SearchBar from "material-ui-search-bar";
 import TableContainer from "@material-ui/core/TableContainer";
@@ -13,6 +13,10 @@ import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 
 const useStyles = makeStyles((theme) => ({
+    resultsTable: {
+        height: 600,
+        overflow: 'scroll'
+    }
 
 
 }));
@@ -42,7 +46,9 @@ export default function Venues() {
 
   return (
     <div className={classes.root}>
-        <Box m={3}>
+        <Box>
+            <Divider/>
+            <br/>
             <Grid container>
                <Grid item xs={12} md={12} lg={12}>
                         <SearchBar placeholder='Search Location or Venue'
@@ -51,7 +57,7 @@ export default function Venues() {
                 <Grid style={{paddingTop: 20}} item xs={12} md={12} lg={12}>
                     { searchResults.length ?
                         <Paper>
-                            <TableContainer component={Paper}>
+                            <TableContainer component={Paper} className={classes.resultsTable}>
                                 <Table size='small'>
                                     <TableHead>
                                         <TableRow>
@@ -90,7 +96,11 @@ export default function Venues() {
                     }
                 </Grid>
             </Grid>
+            <br/>
+            <Divider/>
         </Box>
     </div>
   );
 }
+
+

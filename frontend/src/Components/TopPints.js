@@ -12,6 +12,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 import styles from '../styles.module.css'
+import {Divider} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     tableHeadText: {
@@ -23,6 +24,10 @@ const useStyles = makeStyles((theme) => ({
        marginTop: '20px',
        marginLeft: '45%'
   },
+   table: {
+       height: 600,
+       overflow: 'scroll',
+   }
 
 }));
 
@@ -55,16 +60,18 @@ export default function TopPints() {
 
   return (
     <div className={classes.root}>
-        <Box m={3}>
+        <Box>
+            <Divider/>
             {topPintsList ?
                 <Grid container>
-                    <Grid item xs={12} md={12} lg={12}>
-                        <SearchBar placeholder='Search Location'
-                                   onChange={(searchTerm) => SearchLocation(searchTerm)}/>
-                    </Grid>
+                    {//<Grid item xs={12} md={12} lg={12}>
+                       // <SearchBar placeholder='Search Location'
+                                   //onChange={(searchTerm) => SearchLocation(searchTerm)}/>
+                    //</Grid>
+                    }
                     <Grid style={{paddingTop: 20}} item xs={12} md={12} lg={12}>
                         <Paper>
-                            <TableContainer component={Paper}>
+                            <TableContainer component={Paper} className={classes.table}>
                                 <Table size='small'>
                                     <TableHead>
                                         <TableRow>
@@ -101,8 +108,13 @@ export default function TopPints() {
                             </TableContainer>
                         </Paper>
                     </Grid>
+                    <br/>
+                    <br/>
+                    <Divider/>
                 </Grid> : <CircularProgress className={classes.progressLoader} />
             }
+            <br/>
+            <Divider/>
         </Box>
     </div>
   );

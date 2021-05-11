@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box'
 import Grid from "@material-ui/core/Grid";
-import {Paper} from "@material-ui/core";
+import {Divider, Paper} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles((theme) => ({
@@ -11,11 +11,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function About() {
-    const classes = makeStyles()
+    const classes = useStyles()
 
   return (
     <div className={classes.root}>
-        <Box m={3}>
+        <Box>
+            <Divider/>
+            <br/>
             <Grid item lg={12} md={12} sm={12}>
                     <Paper elevation={3} style={{height: 100}}>
                         <Typography style={{paddingTop: 20, paddingLeft: 20}}>Not all pints are created equal. The
@@ -25,6 +27,8 @@ export default function About() {
                         </Typography>
                     </Paper>
             </Grid>
+            <br/>
+             <Divider/>
         </Box>
     </div>
   );
