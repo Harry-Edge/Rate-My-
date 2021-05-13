@@ -27,6 +27,9 @@ const useStyles = makeStyles((theme) => ({
    table: {
        height: 600,
        overflow: 'scroll',
+       border: '2px',
+       borderStyle: 'solid',
+       borderColor: 'grey'
    }
 
 }));

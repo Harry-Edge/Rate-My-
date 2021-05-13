@@ -19,7 +19,7 @@ export default function About() {
             <Divider/>
             <br/>
             <Grid item lg={12} md={12} sm={12}>
-                    <Paper elevation={3} style={{height: 100}}>
+                    <Paper elevation={3} style={{height: 100,    border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
                         <Typography style={{paddingTop: 20, paddingLeft: 20}}>Not all pints are created equal. The
                             same delicious beer can taste completely
                             different depending on venue. Rate my beer give people the chance to for the

@@ -52,11 +52,12 @@ export default function Venues() {
             <Grid container>
                <Grid item xs={12} md={12} lg={12}>
                         <SearchBar placeholder='Search Location or Venue'
+                                   style={{ border: '2px', borderStyle: 'solid', borderColor: 'grey'}}
                                    onChange={(searchTerm) => search(searchTerm)}/>
                 </Grid>
                 <Grid style={{paddingTop: 20}} item xs={12} md={12} lg={12}>
                     { searchResults.length ?
-                        <Paper>
+                        <Paper style={{   border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
                             <TableContainer component={Paper} className={classes.resultsTable}>
                                 <Table size='small'>
                                     <TableHead>

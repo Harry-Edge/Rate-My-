@@ -15,15 +15,16 @@ import {Combobox, ComboboxInput, ComboboxPopover,
         ComboboxList, ComboboxOption, ComboboxOptionText} from "@reach/combobox";
 import "@reach/combobox/styles.css";
 import Geocode from 'react-geocode';
+import Card from '@material-ui/core/Card'
 
 const useStyles = makeStyles((theme) => ({
     topPintsAreaText: {
         fontWeight: 650,
         color: 'grey',
-        fontSize: 20,
+        fontSize: 22,
         display: 'flex',
         justifyContent: 'center',
-        paddingTop: 7
+        paddingTop: 10
     },
     topPintsTable: {
        height: 450,
@@ -59,7 +60,11 @@ const useStyles = makeStyles((theme) => ({
           color: '#595959',
 
          },
-    }
+    },
+    dropDownVenues: {
+        borderStyle: 'solid',
+        borderColor: 'grey',
+    },
 
 }));
 
@@ -165,17 +170,17 @@ export default function Home() {
                 <Divider/>
                 <br/>
                 <Grid container spacing={2}>
-                    <Grid item lg={12} md={12} sm={12}>
+                    <Grid item lg={12} md={12} xs={12}>
                         <Search panTo={panTo} getTopRatedPints={getTopRatedPints}
                                               currentLocation={currentLocation}
                                               setCurrentLocation={setCurrentLocation}/>
                     </Grid>
-                    <Grid item lg={8} md={12} sm={12}>
+                    <Grid item lg={8} md={12} xs={12}>
                         <Locate panTo={panTo} getTopRatedPints={getTopRatedPints}
                                               currentLocation={currentLocation}
                                               setCurrentLocation={setCurrentLocation}/>
                         <Paper elevation={3}>
-                            <div style={{width: '100%', height: '60vh'}}>
+                            <div style={{width: '100%', height: '60vh',   border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
                                 {
                                     isLoaded ?
                                         <GoogleMap mapContainerStyle={mapContainerStyle}
@@ -187,8 +192,8 @@ export default function Home() {
                             </div>
                         </Paper>
                     </Grid>
-                    <Grid item lg={4} md={12} sm={12}>
-                        <Paper style={{height: '60vh'}}>
+                    <Grid item lg={4} md={12} xs={12}>
+                        <Paper style={{height: '60vh',  border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
                             <Typography
                                 className={classes.topPintsAreaText}>
                                 {currentLocation ?`Top Rated Pints In ${currentLocation}` : "Search Above to View the Best Pints"}</Typography>
@@ -240,6 +245,8 @@ function Locate(props) {
 
 function Search(props){
 
+    const classes = useStyles()
+
     const {ready, value, suggestions: {status, data}, setValue, clearSuggestions} = usePlaceAutocomplete({
         requestOptions: {location: {lat: () => 53.480759, lng: () => -2.242631}, // auto complete based on users location
                         radius: 400}
@@ -260,19 +267,19 @@ function Search(props){
     }
 
     return <div>
-            <Combobox onSelect={handleSelect}>
-                    <ComboboxInput value={value} onChange={(e) => {
-                        setValue(e.target.value)}}
-                        disabled={!ready}
-                        style={{width: '99.5%', height: 50, fontSize: 20, borderStyle: 'solid', borderColor: 'grey'}}
-                        placeholder=" Search City"/>
-                    <ComboboxPopover>
-                        <ComboboxList>
-                            {   status === "OK" && data.map(({description}, index) => (
-                                <ComboboxOption key={index} value={" " + description}><ComboboxOptionText/></ComboboxOption>))
-                            }
-                        </ComboboxList>
-                    </ComboboxPopover>
+                <Combobox onSelect={handleSelect}>
+                        <ComboboxInput value={value} onChange={(e) => {
+                            setValue(e.target.value)}}
+                            disabled={!ready}
+                            style={{width: '99.5%', height: 50, fontSize: 20, borderStyle: 'solid', borderColor: 'grey'}}
+                            placeholder=" Search City"/>
+                        <ComboboxPopover>
+                            <ComboboxList className={classes.dropDownVenues}>
+                                {   status === "OK" && data.map(({description}, index) => (
+                                    <ComboboxOption key={index} value={" " + description}><ComboboxOptionText/></ComboboxOption>))
+                                }
+                            </ComboboxList>
+                        </ComboboxPopover>
                 </Combobox>
            </div>
 }

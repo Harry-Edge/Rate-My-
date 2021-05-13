@@ -4,7 +4,6 @@ import RateMyPint from "./Components/RateMyPint";
 
 function App() {
   return (
-
       <RateMyPint/>
   );
 }

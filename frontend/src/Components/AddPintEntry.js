@@ -5,7 +5,6 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
 import {TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
 import usePlaceAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
@@ -24,8 +23,34 @@ const useStyles = makeStyles((theme) => ({
     },
     textField: {
         width: 400,
-        marginTop: 15
-    },
+        marginTop: 15},
+    textBox: {
+            "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+              borderColor: "grey",
+            },
+            "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+              borderColor: "grey"
+            },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "grey"
+            },
+            "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-input": {
+              color: "grey",
+                fontWeight: 650,
+            },
+            "& .MuiInputLabel-outlined": {
+              color: "grey",
+                fontWeight: 650,
+            },
+            "&:hover .MuiInputLabel-outlined": {
+              color: "grey",
+                fontWeight: 650,
+            },
+            "& .MuiInputLabel-outlined.Mui-focused": {
+              color: "grey",
+                fontWeight: 650,
+            }
+          },
     dropDownVenues: {
         zIndex: 9999,
         position: 'absolute',
@@ -36,10 +61,13 @@ const useStyles = makeStyles((theme) => ({
     },
     searchVenue: {
         marginTop: 15,
-        width: '98%',
-        height: 50,
+        width: '99%',
+        height: 53,
         fontSize: 17,
         fontColor: 'grey',
+        fontWeight: 650,
+        border: "1px",
+        borderRadius: "4px",
         borderColor: 'grey',
         borderStyle: 'solid',
     }
@@ -109,6 +137,8 @@ export default function AddPintEntry(props) {
                              renderInput={(parmas) => <
                                  TextField {...parmas} variant='outlined'
                                            label='Beer Name'
+                                           className={classes.textBox}
+                                           inputLabelProps={{classes: {root: classes.textBox}}}
                                            onChange={(event) => {
                                                setBeerNameChosen(event.target.value)
                                            }}/>}
@@ -122,6 +152,7 @@ export default function AddPintEntry(props) {
                              renderInput={(parmas) => <
                                  TextField {...parmas} variant='outlined'
                                            label='Brewery'
+                                           className={classes.textBox}
                                             onChange={(event) => {
                                                setBreweryChosen(event.target.value)}}/>}
                          />

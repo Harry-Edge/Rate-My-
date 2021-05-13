@@ -24,16 +24,19 @@ const useStyles = makeStyles((theme) => ({
         paddingTop: 7
     },
     navMenuItem:{
+        display: 'none',
         '&:hover': {
           backgroundColor: '#f2f2f2',
-          borderColor: '#f2f2f2'
+          borderColor: '#f2f2f2',
          },
+        [theme.breakpoints.up('sm')]: {
+              display: 'block',}
     },
     addEntryButton: {
         color: 'white',
         textTransform: 'none',
 
-        width: '90%',
+        width: '100%',
         float: 'right',
         fontWeight: 650,
         backgroundColor: '#009933',
@@ -43,7 +46,9 @@ const useStyles = makeStyles((theme) => ({
           backgroundColor: '#00802b',
           borderColor: '#00802b'
          },
-    }
+        [theme.breakpoints.up('lg', 'md')]: {
+              width: '85%',}
+    },
 }));
 
 export default function MainNavigation() {
@@ -60,60 +65,44 @@ export default function MainNavigation() {
   const classes = useStyles();
 
   return (
-        <Router>
             <div className={classes.root}>
                 <Box m={3}>
                        <Grid container>
-                           <Grid item xs={2}
+                           <Grid item  lg={2} md={2} sm={2}
                                  className={classes.navMenuItem}
                                  style={window.location.pathname === '/' ? {backgroundColor: '#f2f2f2'} : null}>
                                <Link onClick={() => setCurrentPage('home')}
                                      className={classes.navMenuItemsText} to='/'>Home</Link>
                            </Grid>
-                           <Grid item xs={2}
+                           <Grid item lg={2} md={2} sm={2}
                                  className={classes.navMenuItem}
                                  style={window.location.pathname === '/top-pints' ? {backgroundColor: '#f2f2f2'} : null}>
                                 <Link onClick={() => setCurrentPage('topPints')}
                                       className={classes.navMenuItemsText} to='/top-pints'>Top Pints</Link>
                            </Grid>
-                            <Grid item xs={2}
+                            <Grid item lg={2} md={2} sm={2}
                                   className={classes.navMenuItem}
                                   style={window.location.pathname === '/venues' ? {backgroundColor: '#f2f2f2'} : null}>
                                  <Link onClick={() => setCurrentPage('venues')}
                                      className={classes.navMenuItemsText} to='/venues'>Locations</Link>
 
                            </Grid>
-                            <Grid item xs={2}
+                            <Grid item lg={2} md={2} sm={2}
                                   className={classes.navMenuItem}
                                   style={window.location.pathname === '/about' ? {backgroundColor: '#f2f2f2'} : null}>
                                   <Link onClick={() => setCurrentPage('about')}
                                      className={classes.navMenuItemsText} to='/about'>About</Link>
                            </Grid>
-                            <Grid item xs={4}>
+                            <Grid item lg={4} md={4} sm={4} xs={12}>
                                <Button className={classes.addEntryButton}
                                        onClick={() => setOpen(true)} >Add Pint Entry</Button>
                            </Grid>
                        </Grid>
                 </Box>
-            </div>
-            <Switch>
-                <Route exact path='/'>
-                    <Home/>
-                </Route>
-                <Route exact path='/top-pints'>
-                    <TopPints/>
-                </Route>
-                <Route exact path='/venues'>
-                    <Venues/>
-                </Route>
-                <Route exact path='/about'>
-                    <About/>
-                </Route>
-            </Switch>
-            {
+                {
                 open ?
                     <AddPintEntry open={open} close={closeAddPint}/> : null
-            }
-        </Router>
+                }
+            </div>
       );
 }
