@@ -7,6 +7,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Button from "@material-ui/core/Button";
 import {TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
+import Typography from "@material-ui/core/Typography";
 import usePlaceAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
 import {
     Combobox,
@@ -17,13 +18,20 @@ import {
     ComboboxPopover
 } from "@reach/combobox";
 
+import GoogleMapsSearch from "./test";
+
 const useStyles = makeStyles((theme) => ({
     title: {
-        fontSize: 100,
+        fontSize: 25,
+        fontWeight: 650,
+        display: 'flex',
+        color: 'grey',
+        justifyContent: 'center'
     },
     textField: {
         width: 400,
-        marginTop: 15},
+        marginTop: 15
+    },
     textBox: {
             "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
               borderColor: "grey",
@@ -49,11 +57,13 @@ const useStyles = makeStyles((theme) => ({
             "& .MuiInputLabel-outlined.Mui-focused": {
               color: "grey",
                 fontWeight: 650,
-            }
-          },
+            },
+            width: 400,
+            marginTop: 15,
+            color: "grey",
+            fontWeight: 650,
+    },
     dropDownVenues: {
-        zIndex: 9999,
-        position: 'absolute',
         backgroundColor: 'white',
         borderStyle: 'solid',
         borderColor: 'grey',
@@ -70,6 +80,16 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: "4px",
         borderColor: 'grey',
         borderStyle: 'solid',
+    },
+    closeButton: {
+        backgroundColor: 'red',
+        color: 'white',
+        fontWeight: 650
+    },
+    submitButton: {
+        backgroundColor: 'green',
+        color: 'white',
+        fontWeight: 650
     }
 }));
 
@@ -83,8 +103,15 @@ export default function AddPintEntry(props) {
   const [breweryChosen, setBreweryChosen] = useState()
   const [venueChosen, setVenueChosen] = useState()
   const [priceChosen, setPriceChosen] = useState()
+  const [valueRating, setValueRating] = useState()
+  const [atmosphereRating, setAtmosphereRating] = useState()
+  const [tasteRating, setTasteRating] = useState()
 
   const [priceValidationError, setPriceValidationError] = useState(false)
+  const [valueRatingValidationError, setValueRatingValidationError] = useState(false)
+  const [atmosphereRatingError, setAtmosphereRatingError] = useState(false)
+  const [tasteRatingError, setTasteRatingError] = useState(false)
+
 
   useEffect (() => {
         fetch("http://127.0.0.1:8000/api/get-beer-names")
@@ -95,12 +122,13 @@ export default function AddPintEntry(props) {
 
     },[])
 
-
   function submitRating () {
       const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({beer_name: beerNameChosen, brewery_name: breweryChosen, price: priceChosen})
+            body: JSON.stringify({beer_name: beerNameChosen, brewery_name: breweryChosen, price: priceChosen,
+                                        value_for_money: valueRating, atmosphere: atmosphereRating,
+                                         taste: tasteRating})
       }
       fetch("http://127.0.0.1:8000/api/submit-rating", requestOptions)
          .then((response) => response.json())
@@ -110,22 +138,49 @@ export default function AddPintEntry(props) {
   }
 
   function checkPriceIsValid(price) {
-         if (price > 0 && price <= 10){
-            console.log("herer")
+         if (price > 1 && price <= 10){
             setPriceChosen(price)
             setPriceValidationError(false)
         }else{
-            console.log("cock")
             setPriceValidationError(true)
         }
   }
-
+  function checkRatingIsValid(rating) {
+      if (rating >= 0 && rating <=10 ){
+          return true
+      }else {
+          return false
+      }
+  }
+  function checkValueForMoneyIsValid(rating) {
+      if (checkRatingIsValid(rating)) {
+          setValueRating(rating)
+          setValueRatingValidationError(false)
+      }else{
+          setValueRatingValidationError(true)
+      }
+  }
+  function checkAtmosphereRatingIsValid(rating){
+      if (checkRatingIsValid(rating)) {
+          setAtmosphereRating(rating)
+          setAtmosphereRatingError(false)
+      }else{
+          setAtmosphereRatingError(true)
+      }
+  }
+  function checkTasteRatingIsValid(rating){
+      if(checkRatingIsValid(rating)){
+          setTasteRating(rating)
+          setTasteRatingError(false)
+      }else {
+          setTasteRatingError(true)
+      }
+  }
 
   return (
       <Dialog open={props.open} >
-        <DialogTitle className={classes.title}>Add Pint Entry</DialogTitle>
+        <DialogTitle><Typography className={classes.title}>Add Pint Entry</Typography></DialogTitle>
         <DialogContent style={{width: 400 }}>
-
             {
                 beerNames ?
                          <div>
@@ -144,7 +199,6 @@ export default function AddPintEntry(props) {
                                            }}/>}
                          />
                           <Autocomplete
-                             className={classes.textField}
                              options={beerNames}
                              freeSolo
                              getOptionLabel={(option) => option.brewery}
@@ -159,22 +213,34 @@ export default function AddPintEntry(props) {
                          </div>
                          : null
             }
-           <Search/>
+           <GoogleMapsSearch/>
            <TextField
                error={priceValidationError}
                helperText={priceValidationError ? "Must be between 1-10" : null}
-               className={classes.textField} label="Price (£)" variant="outlined"
+               className={classes.textBox} label="Price (£)" variant="outlined"
                         onChange={(e) =>
                             checkPriceIsValid(e.target.value)}/>
-           <TextField className={classes.textField} label="Value For Money (/10)" variant="outlined"/>
-           <TextField className={classes.textField} label="Atomosphere (/10)" variant="outlined"/>
-           <TextField className={classes.textField} label="Taste (/10)" variant="outlined"/>
+           <TextField className={classes.textBox} label="Value For Money (/10)" variant="outlined"
+                      error={valueRatingValidationError}
+                      helperText={valueRatingValidationError ? "Must be between 0-10" : null}
+                      onChange={(e) =>
+                                    checkValueForMoneyIsValid(e.target.value)}/>
+           <TextField className={classes.textBox} label="Atmosphere (/10)" variant="outlined"
+                      error={atmosphereRatingError}
+                      helperText={atmosphereRatingError ? "Must be between 0-10" : null}
+                      onChange={(e) =>
+                                     checkAtmosphereRatingIsValid(e.target.value)}  />
+           <TextField className={classes.textBox} label="Taste (/10)" variant="outlined"
+                      error={tasteRatingError}
+                      helperText={tasteRatingError ? "Must be between 0-10" : null}
+                      onChange={(e) =>
+                                     checkTasteRatingIsValid(e.target.value)} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => props.close()} style={{backgroundColor: 'red', color: 'white', fontWeight: 650}} variant='contained'>
+          <Button onClick={() => props.close()} className={classes.closeButton} variant='contained'>
             Close
           </Button>
-           <Button style={{backgroundColor: 'green', color: 'white', fontWeight: 650}}
+           <Button className={classes.submitButton}
                    variant='contained'
                    onClick={() => submitRating()}>Submit
           </Button>
@@ -192,32 +258,27 @@ function Search(props){
                         radius: 400}
     })
 
-    const handleSelect = async (address) => {
+    const handleSelect = (address) => {
+        console.log(address)
+        console.log("here")
         setValue(address, false);
         clearSuggestions()
-        try {
-            const results = await getGeocode({address})
-            await props.setCurrentLocation(results[0].address_components[0].long_name)
-            const {lat, lng} = await getLatLng(results[0])
-            props.panTo({lat: lat, lng: lng, panLvl: 14})
-            props.getTopRatedPints(results[0].address_components[0].long_name)
-        }catch (error){
-            console.log("Error:", error)
-        }
     }
 
     return <div>
-            <Combobox onSelect={handleSelect}>
+            <Combobox onSelect={handleSelect}
+            >
                     <ComboboxInput value={value} onChange={(e) => {
                         setValue(e.target.value)}}
                         disabled={!ready}
                         className={classes.searchVenue}
-                        placeholder=" Search Venue Name (Bar, Restruant, Pub"/>
+                        placeholder=" Search Venue Name (Bar, Restaurant, Pub)"/>
                     <ComboboxPopover>
-                        <ComboboxList
+                        <ComboboxList style={{zIndex: 2000, position: 'absolute'}}
                                     className={classes.dropDownVenues}>
                             {   status === "OK" && data.map(({description}, index) => (
-                                <ComboboxOption key={index} value={" " + description}><ComboboxOptionText/></ComboboxOption>))
+                                <ComboboxOption key={index}
+                                                value={" " + description}><ComboboxOptionText/></ComboboxOption>))
                             }
                         </ComboboxList>
                     </ComboboxPopover>

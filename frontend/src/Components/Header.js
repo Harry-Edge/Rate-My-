@@ -18,6 +18,7 @@ import Home from "./Home";
 import TopPints from "./TopPints";
 import Venues from "./Venues";
 import About from "./About";
+import AddPintEntry from "./AddPintEntry";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -82,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
          },
   },
   navItemText: {
-    width: 170,
+    width: 190,
     fontWeight: 650,
     fontSize: 18,
     color: 'black',
@@ -94,11 +95,32 @@ const useStyles = makeStyles((theme) => ({
           backgroundColor: '#f2f2f2',
           borderColor: '#f2f2f2',
          },
-  }
+  },
+  navButton: {
+        display: 'flex',
+        justifyContent: 'center',
+  },
+  addEntryButton: {
+        color: 'white',
+        textTransform: 'none',
+        width: '90%',
+        fontWeight: 650,
+        backgroundColor: '#009933',
+        borderColor: '#009933',
+
+        '&:hover': {
+          backgroundColor: '#00802b',
+          borderColor: '#00802b'
+         },
+        [theme.breakpoints.up('lg', 'md')]: {
+              width: '85%',}
+    },
 }));
 
 export default function Header() {
   const classes = useStyles();
+
+  const [open, setOpen] = useState(false)
 
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -111,7 +133,9 @@ export default function Header() {
   const handleClose = () => {
     setAnchorEl(null)
   }
-
+  function closeAddPint() {
+      setOpen(false)
+  }
 
   return (
     <div className={classes.root}>
@@ -146,37 +170,43 @@ export default function Header() {
                     open={Boolean(anchorEl)}
                     onClose={handleClose}>
                       <MenuItem onClick={handleClose}
-                              className={classes.navItem}
-                              style={window.location.pathname === '/' ? {backgroundColor: '#f2f2f2'} : null}>
-                              <Link
-                                 className={classes.navItemText} to='/'>Home</Link>
+                                className={classes.navItem}
+                                style={window.location.pathname === '/' ? {backgroundColor: '#f2f2f2'} : null}>
+                                <Link className={classes.navItemText} to='/'>Home</Link>
                       </MenuItem>
                       <MenuItem onClick={handleClose}
-                              className={classes.navItem}
-                              style={window.location.pathname === '/top-pints' ? {backgroundColor: '#f2f2f2'} : null}>
-                              <Link
-                                 className={classes.navItemText} to='/top-pints'>Top Pints</Link>
+                                className={classes.navItem}
+                                style={window.location.pathname === '/top-pints' ? {backgroundColor: '#f2f2f2'} : null}>
+                                <Link className={classes.navItemText} to='/top-pints'>Top Pints</Link>
                       </MenuItem>
                       <MenuItem onClick={handleClose}
-                              className={classes.navItem}
-                              style={window.location.pathname === '/venues' ? {backgroundColor: '#f2f2f2'} : null}>
-                              <Link
-                                 className={classes.navItemText} to='/venues'>Locations</Link>
+                                className={classes.navItem}
+                                style={window.location.pathname === '/venues' ? {backgroundColor: '#f2f2f2'} : null}>
+                                <Link className={classes.navItemText} to='/venues'>Locations</Link>
                       </MenuItem>
-                      <MenuItem
-                              className={classes.navItem}
-                              style={window.location.pathname === '/about' ? {backgroundColor: '#f2f2f2'} : null}>
-                              <Link
-                                 className={classes.navItemText} to='/about'>About</Link>
+                      <MenuItem onClick={handleClose}
+                                className={classes.navItem}
+                                style={window.location.pathname === '/about' ? {backgroundColor: '#f2f2f2'} : null}>
+                                <Link className={classes.navItemText} to='/about'>About</Link>
                       </MenuItem>
                       <MenuItem onClick={handleClose}
                                 className={classes.navItem}>
                         <Typography className={classes.navItemText}>Search</Typography>
                       </MenuItem>
+                      <MenuItem onClick={handleClose}
+                                className={classes.navButton}>
+                                <Button className={classes.addEntryButton}
+                                        onClick={() => setOpen(true)}
+                                        >Add Pint Entry</Button>
+                      </MenuItem>
 
               </Menu>
         </Toolbar>
       </AppBar>
+        {
+                open ?
+                    <AddPintEntry open={open} close={closeAddPint}/> : null
+        }
     </div>
   );
 }

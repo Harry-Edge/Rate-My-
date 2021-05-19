@@ -16,6 +16,7 @@ import {Combobox, ComboboxInput, ComboboxPopover,
 import "@reach/combobox/styles.css";
 import Geocode from 'react-geocode';
 import Card from '@material-ui/core/Card'
+import GoogleMapsSearch from "./test";
 
 const useStyles = makeStyles((theme) => ({
     topPintsAreaText: {
@@ -254,6 +255,7 @@ function Search(props){
 
     const handleSelect = async (address) => {
         setValue(address, false);
+        console.log("here")
         clearSuggestions()
         try {
             const results = await getGeocode({address})
@@ -282,4 +284,38 @@ function Search(props){
                         </ComboboxPopover>
                 </Combobox>
            </div>
+}
+
+function NewSearch() {
+
+    const {ready, value, suggestions: {status, data}, setValue, clearSuggestions} = usePlaceAutocomplete({
+        requestOptions: {location: {lat: () => 53.480759, lng: () => -2.242631}, // auto complete based on users location
+                        radius: 400}
+    })
+
+    const handleSelect = async (address) => {
+        setValue(address, false);
+        console.log("here")
+        clearSuggestions()
+
+    }
+
+    return <div>
+
+        <Autocomplete   options={data}
+                        freeSolo
+                        getOptionLabel={(option) => option}
+                        onChange={(e, value) => {
+                                        setValue(e.target.value) }}
+                        renderInput={(params) =>
+                            <TextField
+                                {...params}
+                                variant='outlined'
+                                label='search'
+                            />
+                        } />
+
+
+    </div>
+
 }

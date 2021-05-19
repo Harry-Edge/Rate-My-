@@ -35,20 +35,23 @@ const useStyles = makeStyles((theme) => ({
     addEntryButton: {
         color: 'white',
         textTransform: 'none',
-
-        width: '100%',
+        width: '85%',
         float: 'right',
         fontWeight: 650,
         backgroundColor: '#009933',
         borderColor: '#009933',
-
         '&:hover': {
           backgroundColor: '#00802b',
           borderColor: '#00802b'
          },
         [theme.breakpoints.up('lg', 'md')]: {
-              width: '85%',}
+              width: '85%',} ,
     },
+    addEntryDiv: {
+        display: 'none',
+        [theme.breakpoints.up( 'sm')]: {
+              display: 'block',}
+    }
 }));
 
 export default function MainNavigation() {
@@ -93,7 +96,8 @@ export default function MainNavigation() {
                                   <Link onClick={() => setCurrentPage('about')}
                                      className={classes.navMenuItemsText} to='/about'>About</Link>
                            </Grid>
-                            <Grid item lg={4} md={4} sm={4} xs={12}>
+                            <Grid item lg={4} md={4} sm={4}
+                                  className={classes.addEntryDiv}>
                                <Button className={classes.addEntryButton}
                                        onClick={() => setOpen(true)} >Add Pint Entry</Button>
                            </Grid>
