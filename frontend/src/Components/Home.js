@@ -69,11 +69,8 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-const libraries = ['places']
 
-Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
-
-export default function Home() {
+export default function Home(props) {
 
   const classes = useStyles();
 
@@ -145,12 +142,6 @@ export default function Home() {
       }, 1)
     }
 
-  const {isLoaded} = useLoadScript(
-      {
-          googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-          libraries
-      }
-  )
   const mapContainerStyle = {
       width: '100%',
       height: '60vh'
@@ -183,7 +174,7 @@ export default function Home() {
                         <Paper elevation={3}>
                             <div style={{width: '100%', height: '60vh',   border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
                                 {
-                                    isLoaded ?
+                                    props.gMapsApiKeyAndLibraryLoaded ?
                                         <GoogleMap mapContainerStyle={mapContainerStyle}
                                                    zoom={14}
                                                    options={options}

@@ -4,9 +4,11 @@ from .models import *
 
 class RatingSerializer(serializers.ModelSerializer):
 
+
     class Meta:
         model = Rating
-        fields = ('id', 'beer', 'venue', 'serving_size', 'price', 'submitted_by', 'rating',)
+        fields = ('id', 'beer', 'venue', 'serving_size', 'price', 'value_for_money_rating', 'atmosphere_rating',
+                  'taste_rating', 'submitted_by', 'rating',)
 
 
 class VenueSerializer(serializers.ModelSerializer):

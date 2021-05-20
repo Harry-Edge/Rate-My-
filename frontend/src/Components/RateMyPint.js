@@ -9,6 +9,9 @@ import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom'
 import {makeStyles} from "@material-ui/core/styles";
 import Venues from "./Venues";
 import About from "./About";
+import Footer from "./Footer";
+import {useLoadScript} from "@react-google-maps/api";
+import Geocode from "react-geocode";
 
 const useStyles = makeStyles((theme) => ({
     body: {
@@ -16,12 +19,21 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const libraries = ['places']
+
+Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
 
 function RateMyPint() {
   const [currentPage, setCurrentPage] = useState('home');
   const classes = useStyles();
 
 
+  const {isLoaded} = useLoadScript(
+      {
+          googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+          libraries
+      }
+  )
 
   return (
     <Router>
@@ -29,22 +41,22 @@ function RateMyPint() {
         <Header/>
         <Box m={4}>
             <MainNavigation changePage={setCurrentPage} currentPage={currentPage}/>
-
-                 <Switch>
-                    <Route exact path='/' component={Home}>
-                        <Home/>
-                    </Route>
-                    <Route exact path='/top-pints'>
-                        <TopPints/>
-                    </Route>
-                    <Route exact path='/venues'>
-                        <Venues/>
-                    </Route>
-                    <Route exact path='/about'>
-                        <About/>
-                    </Route>
-                </Switch>
+             <Switch>
+                <Route exact path='/' component={Home}>
+                    <Home gMapsApiKeyAndLibraryLoaded={isLoaded}/>
+                </Route>
+                <Route exact path='/top-pints'>
+                    <TopPints/>
+                </Route>
+                <Route exact path='/venues'>
+                    <Venues/>
+                </Route>
+                <Route exact path='/about'>
+                    <About/>
+                </Route>
+            </Switch>
         </Box>
+        <Footer/>
     </div>
     </Router>
   );

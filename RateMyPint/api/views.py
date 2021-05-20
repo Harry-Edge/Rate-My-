@@ -1,5 +1,6 @@
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
+from django.core import serializers as s
 from rest_framework import status
 from rest_framework.response import Response
 from django.db.models import Q
@@ -92,7 +93,6 @@ class GetBeerNames(APIView):
     def get(self, request):
 
         data = Beer.objects.filter().values()
-        print(data)
 
         return Response(data, status=status.HTTP_200_OK)
 
@@ -102,9 +102,46 @@ class SubmitBeerRating(APIView):
 
     def post(self, request):
 
-        serializer = GenericSerializer(data=request.data)
-        print(serializer)
+        #serializer = RatingSerializer(data=request.data)
+        print(request.data)
 
+        submitted_data = request.data
+
+        if submitted_data:
+            beer_object = Beer.objects.filter(name=submitted_data['beer']['name'])
+            venue_object = Venue.objects.filter(google_maps_id=submitted_data['venue']['googleMapsPlaceID'])
+            if not beer_object:
+                beer_object = Beer.objects.create(name=submitted_data['beer']['name'],
+                                                  brewery=submitted_data['beer']['brewery'])
+            else:
+                beer_object = beer_object[0]
+            if not venue_object:
+                venue_object = Venue.objects.create(name=submitted_data['venue']['name'],
+                                                    street=submitted_data['venue']['street'],
+                                                    location=submitted_data['venue']['location'],
+                                                    google_maps_id=submitted_data['venue']['googleMapsPlaceID'])
+            else:
+                venue_object = venue_object[0]
+
+            rating_object = Rating.objects.create(beer=beer_object,
+                                                  venue=venue_object,
+                                                  serving_size=submitted_data['serving_size'],
+                                                  price=float(submitted_data['price']),
+                                                  value_for_money_rating=float(submitted_data['value_for_money_rating']),
+                                                  atmosphere_rating=float(submitted_data['atmosphere_rating']),
+                                                  taste_rating=float(submitted_data['taste_rating']))
+
+            print(rating_object)
+            print(venue_object)
+            return Response("Pint Entry Added Successfully", status=status.HTTP_200_OK)
+
+
+        else:
+            return Response('Bad Request', status=status.HTTP_400_BAD_REQUEST)
+
+
+
+        """
         if serializer.is_valid():
             print(serializer)
             print(serializer.data.get('beer_name'))
@@ -118,9 +155,12 @@ class SubmitBeerRating(APIView):
                 Rating.objects.create(beer=beer_object, price=int(serializer.data.get('price')))
             else:
                 print("created new beer entery ")
+                
+        
 
             return Response("All Good ", status=status.HTTP_200_OK)
-        return Response('Bad Request', status=status.HTTP_400_BAD_REQUEST)
+            """
+
 
 
 

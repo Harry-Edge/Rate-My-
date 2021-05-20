@@ -95,6 +95,14 @@ const useStyles = makeStyles((theme) => ({
 
 const libraries = ['places']
 
+const beerServingSizes = [
+    'Stein',
+    'Pint',
+    'Schooner',
+    'Half-Pint',
+    '1/3 Pint'
+]
+
 export default function AddPintEntry(props) {
   const classes = useStyles()
 
@@ -104,8 +112,11 @@ export default function AddPintEntry(props) {
   const [venueChosen, setVenueChosen] = useState()
   const [priceChosen, setPriceChosen] = useState()
   const [valueRating, setValueRating] = useState()
+  const [servingSize, setServingSize] = useState()
   const [atmosphereRating, setAtmosphereRating] = useState()
   const [tasteRating, setTasteRating] = useState()
+  const [submittedBy, setSubmittedBy] = useState()
+
 
   const [priceValidationError, setPriceValidationError] = useState(false)
   const [valueRatingValidationError, setValueRatingValidationError] = useState(false)
@@ -126,9 +137,13 @@ export default function AddPintEntry(props) {
       const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({beer_name: beerNameChosen, brewery_name: breweryChosen, price: priceChosen,
-                                        value_for_money: valueRating, atmosphere: atmosphereRating,
-                                         taste: tasteRating})
+            body: JSON.stringify({beer: {name: beerNameChosen, brewery: breweryChosen},
+                                        venue: venueChosen,
+                                        serving_size: servingSize,
+                                        price: priceChosen,
+                                        value_for_money_rating: valueRating,
+                                        atmosphere_rating: atmosphereRating,
+                                        taste_rating: tasteRating, })
       }
       fetch("http://127.0.0.1:8000/api/submit-rating", requestOptions)
          .then((response) => response.json())
@@ -188,10 +203,16 @@ export default function AddPintEntry(props) {
                              options={beerNames}
                              freeSolo
                              getOptionLabel={(option) => `${option.name} (${option.brewery})`}
-                             onChange={(event, value) => setBeerNameChosen(value.name)}
+                             onChange={(event, value) =>
+                                        {setBeerNameChosen(value.name)
+                                         if (value.brewery) {
+                                             setBreweryChosen(value.brewery)
+                                             console.log("here")
+                                         }}}
                              renderInput={(parmas) => <
                                  TextField {...parmas} variant='outlined'
                                            label='Beer Name'
+                                           size="small"
                                            className={classes.textBox}
                                            inputLabelProps={{classes: {root: classes.textBox}}}
                                            onChange={(event) => {
@@ -200,41 +221,63 @@ export default function AddPintEntry(props) {
                          />
                           <Autocomplete
                              options={beerNames}
+                             inputValue={breweryChosen ? breweryChosen : ''}
                              freeSolo
+                             defaultValue={breweryChosen ? breweryChosen : null}
                              getOptionLabel={(option) => option.brewery}
-                              onChange={(event, value) => setBreweryChosen(value.brewery)}
+                             onChange={(event, value) => setBreweryChosen(value.brewery)}
                              renderInput={(parmas) => <
                                  TextField {...parmas} variant='outlined'
                                            label='Brewery'
+                                           size="small"
+                                           defaultValue="ueyeyey"
                                            className={classes.textBox}
-                                            onChange={(event) => {
+                                           onChange={(event) => {
                                                setBreweryChosen(event.target.value)}}/>}
                          />
                          </div>
                          : null
             }
-           <GoogleMapsSearch/>
+           <GoogleMapsSearch venueChosen={setVenueChosen}/>
+           <Autocomplete
+                             options={beerServingSizes}
+                             freeSolo
+                             getOptionLabel={(option) => option}
+                             onChange={(event, value) => setServingSize(value)}
+                             renderInput={(parmas) => <
+                                 TextField {...parmas} variant='outlined'
+                                           label='Beer Serving Size'
+                                           size="small"
+                                           className={classes.textBox}
+                                           inputLabelProps={{classes: {root: classes.textBox}}}
+                                           onChange={(event) => {
+                                               setServingSize(event.target.value)
+                                           }}/>}
+                         />
            <TextField
                error={priceValidationError}
                helperText={priceValidationError ? "Must be between 1-10" : null}
-               className={classes.textBox} label="Price (£)" variant="outlined"
+               className={classes.textBox} label="Price (£)" variant="outlined" size="small"
                         onChange={(e) =>
                             checkPriceIsValid(e.target.value)}/>
-           <TextField className={classes.textBox} label="Value For Money (/10)" variant="outlined"
+           <TextField className={classes.textBox} label="Value For Money (/10)" variant="outlined" size="small"
                       error={valueRatingValidationError}
                       helperText={valueRatingValidationError ? "Must be between 0-10" : null}
                       onChange={(e) =>
                                     checkValueForMoneyIsValid(e.target.value)}/>
-           <TextField className={classes.textBox} label="Atmosphere (/10)" variant="outlined"
+           <TextField className={classes.textBox} label="Atmosphere (/10)" variant="outlined" size="small"
                       error={atmosphereRatingError}
                       helperText={atmosphereRatingError ? "Must be between 0-10" : null}
                       onChange={(e) =>
                                      checkAtmosphereRatingIsValid(e.target.value)}  />
-           <TextField className={classes.textBox} label="Taste (/10)" variant="outlined"
+           <TextField className={classes.textBox} label="Taste (/10)" variant="outlined" size="small"
                       error={tasteRatingError}
                       helperText={tasteRatingError ? "Must be between 0-10" : null}
                       onChange={(e) =>
                                      checkTasteRatingIsValid(e.target.value)} />
+           <TextField className={classes.textBox} label="Submitted By... (Optional)" variant="outlined" size="small"
+                      onChange={(e) =>
+                                     setSubmittedBy(e.target.value)} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => props.close()} className={classes.closeButton} variant='contained'>
@@ -242,7 +285,18 @@ export default function AddPintEntry(props) {
           </Button>
            <Button className={classes.submitButton}
                    variant='contained'
-                   onClick={() => submitRating()}>Submit
+                   onClick={() => {
+                       console.log("beername", beerNameChosen)
+                       console.log("breweryname", breweryChosen)
+                       console.log('serving', servingSize)
+                       console.log("price", priceChosen)
+                       console.log("venue", venueChosen)
+                       console.log("value", valueRating)
+                       console.log('atmospg', atmosphereRating)
+                       console.log('taste:', tasteRating)
+                       console.log('sub by', submittedBy)
+                       submitRating()
+                   }}>Submit
           </Button>
         </DialogActions>
       </Dialog>

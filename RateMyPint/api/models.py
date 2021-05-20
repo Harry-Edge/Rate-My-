@@ -13,8 +13,10 @@ class Beer(models.Model):
 
 class Venue(models.Model):
 
-    name = models.CharField(null=True, max_length=50)
+    name = models.CharField(null=True, max_length=100)
+    street = models.CharField(null=True, max_length=100)
     location = models.CharField(null=True, max_length=50)
+    google_maps_id = models.CharField(null=True, max_length=50)
 
     def __str__(self):
         return f'{self.name} - {self.location}'
@@ -30,7 +32,12 @@ class Rating(models.Model):
     venue = models.ForeignKey(Venue, null=True, on_delete=models.CASCADE)
     serving_size = models.CharField(null=True, choices=SERVING_SIZES, max_length=10)
     price = models.FloatField(null=True, blank=True)
+    value_for_money_rating = models.FloatField(null=True, validators=[MinValueValidator(MIN), MaxValueValidator(MAX)])
+    atmosphere_rating = models.FloatField(null=True, validators=[MinValueValidator(MIN), MaxValueValidator(MAX)])
+    taste_rating = models.FloatField(null=True, validators=[MinValueValidator(MIN), MaxValueValidator(MAX)])
     submitted_by = models.CharField(null=True, default='Anonymous User', max_length=20)
+
+
     rating = models.FloatField(null=True, validators=[MinValueValidator(MIN), MaxValueValidator(MAX)])
 
     def __str__(self):

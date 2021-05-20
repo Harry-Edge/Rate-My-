@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function GoogleMapsSearch() {
+export default function GoogleMapsSearch(props) {
   const classes = useStyles();
   const [value, setValue] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
@@ -113,12 +113,28 @@ export default function GoogleMapsSearch() {
       onChange={(event, newValue) => {
         setOptions(newValue ? [newValue, ...options] : options);
         setValue(newValue);
+        if(newValue){
+            console.log(newValue)
+            console.log('location name', newValue.terms[0].value)
+            console.log('street', newValue.terms[1].value)
+            console.log('locality', newValue.terms[2].value)
+            console.log('placeid', newValue.place_id)
+
+            const venue = {name: newValue.terms[0].value,
+                           street: newValue.terms[1].value,
+                           location: newValue.terms[2].value,
+                           googleMapsPlaceID: newValue.place_id
+            }
+            props.venueChosen(venue)
+
+        }
+
       }}
       onInputChange={(event, newInputValue) => {
         setInputValue(newInputValue);
       }}
       renderInput={(params) => (
-        <TextField {...params} label="Add a location" variant="outlined" fullWidth className={classes.textBox} />
+        <TextField {...params} label="Add a location" variant="outlined" size="small" fullWidth className={classes.textBox} />
       )}
       renderOption={(option) => {
         const matches = option.structured_formatting.main_text_matched_substrings;
