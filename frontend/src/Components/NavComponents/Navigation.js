@@ -1,16 +1,11 @@
 import React, {useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid'
 import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
-import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom'
-import Home from "./Home";
-import TopPints from "./TopPints";
-import About from "./About";
-import Venues from "./Venues";
-import AddPintEntry from "./AddPintEntry";
-
+import {Link} from 'react-router-dom'
+import AddPintEntry from "../PagesComponents/AddPintEntry";
+import SuccessMessage from "../MiscComponents/PintEntrySucessMessage";
 
 const useStyles = makeStyles((theme) => ({
     navMenuItemsText: {
@@ -60,6 +55,7 @@ export default function MainNavigation() {
 
   const [open, setOpen] = useState(false)
 
+  const [pintEntryMade, setPintEntryMade] = useState(false)
 
   function closeAddPint() {
       setOpen(false)
@@ -104,9 +100,14 @@ export default function MainNavigation() {
                        </Grid>
                 </Box>
                 {
-                open ?
-                    <AddPintEntry open={open} close={closeAddPint}/> : null
+                    open ?
+                        <AddPintEntry open={open} close={closeAddPint} entryMade={setPintEntryMade}/> : null
                 }
+                {
+                    pintEntryMade ?
+                        <SuccessMessage/> : null
+                }
+
             </div>
       );
 }

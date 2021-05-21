@@ -28,6 +28,8 @@ class Rating(models.Model):
 
     SERVING_SIZES = [('Pint', 'Pint'), ('Schooner', 'Schooner'), ('Half-Pint', 'Half-Pint'), ('1/3 Pint', '1/3 Pint')]
 
+
+    """ TRiple check hte on delete shit """
     beer = models.ForeignKey(Beer, null=True, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, null=True, on_delete=models.CASCADE)
     serving_size = models.CharField(null=True, choices=SERVING_SIZES, max_length=10)
@@ -36,11 +38,23 @@ class Rating(models.Model):
     atmosphere_rating = models.FloatField(null=True, validators=[MinValueValidator(MIN), MaxValueValidator(MAX)])
     taste_rating = models.FloatField(null=True, validators=[MinValueValidator(MIN), MaxValueValidator(MAX)])
     submitted_by = models.CharField(null=True, default='Anonymous User', max_length=20)
-
+    submitted_on = models.DateField(auto_now_add=True, null=True)
 
     rating = models.FloatField(null=True, validators=[MinValueValidator(MIN), MaxValueValidator(MAX)])
 
     def __str__(self):
         return f'{self.beer}{self.venue}{self.serving_size}{self.rating}'
+
+
+class BugReports(models.Model):
+
+    message = models.CharField(null=True, max_length=20000)
+    submitted_on = models.DateField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f'Bug Report ID:{self.message}'
+
+    class Meta:
+        verbose_name_plural = 'Bug Reports'
 
 

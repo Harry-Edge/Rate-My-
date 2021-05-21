@@ -15,3 +15,7 @@ class Venue(admin.ModelAdmin):
 @admin.register(Rating)
 class Rating(admin.ModelAdmin):
     list_display = ('id', 'beer', 'venue', 'serving_size', 'price', 'submitted_by', 'rating')
+
+@admin.register(BugReports)
+class BugReports(admin.ModelAdmin):
+    list_display = ('id', 'message', 'submitted_on')

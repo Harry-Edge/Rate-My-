@@ -5,20 +5,11 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import Button from "@material-ui/core/Button";
-import {TextField} from "@material-ui/core";
+import {Snackbar, TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
 import Typography from "@material-ui/core/Typography";
-import usePlaceAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
-import {
-    Combobox,
-    ComboboxInput,
-    ComboboxList,
-    ComboboxOption,
-    ComboboxOptionText,
-    ComboboxPopover
-} from "@reach/combobox";
-
-import GoogleMapsSearch from "./test";
+import GoogleMapsSearch from "../MiscComponents/GMapsLocationSearch";
+import MuiAlert from '@material-ui/lab/Alert'
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -123,6 +114,7 @@ export default function AddPintEntry(props) {
   const [atmosphereRatingError, setAtmosphereRatingError] = useState(false)
   const [tasteRatingError, setTasteRatingError] = useState(false)
 
+  const [entrySuccessful, setEntrySuccessful] = useState(false)
 
   useEffect (() => {
         fetch("http://127.0.0.1:8000/api/get-beer-names")
@@ -143,12 +135,15 @@ export default function AddPintEntry(props) {
                                         price: priceChosen,
                                         value_for_money_rating: valueRating,
                                         atmosphere_rating: atmosphereRating,
-                                        taste_rating: tasteRating, })
+                                        taste_rating: tasteRating,
+                                        submitted_by: submittedBy})
       }
       fetch("http://127.0.0.1:8000/api/submit-rating", requestOptions)
          .then((response) => response.json())
          .then((data) => {
              console.log(data)
+             //setEntrySuccessful(true)
+             props.entryMade(true)
          })
   }
 
@@ -214,7 +209,7 @@ export default function AddPintEntry(props) {
                                            label='Beer Name'
                                            size="small"
                                            className={classes.textBox}
-                                           inputLabelProps={{classes: {root: classes.textBox}}}
+                                           //inputlabelprops={{classes: {root: classes.textBox}}}
                                            onChange={(event) => {
                                                setBeerNameChosen(event.target.value)
                                            }}/>}
@@ -223,14 +218,12 @@ export default function AddPintEntry(props) {
                              options={beerNames}
                              inputValue={breweryChosen ? breweryChosen : ''}
                              freeSolo
-                             defaultValue={breweryChosen ? breweryChosen : null}
                              getOptionLabel={(option) => option.brewery}
                              onChange={(event, value) => setBreweryChosen(value.brewery)}
                              renderInput={(parmas) => <
                                  TextField {...parmas} variant='outlined'
                                            label='Brewery'
                                            size="small"
-                                           defaultValue="ueyeyey"
                                            className={classes.textBox}
                                            onChange={(event) => {
                                                setBreweryChosen(event.target.value)}}/>}
@@ -249,7 +242,7 @@ export default function AddPintEntry(props) {
                                            label='Beer Serving Size'
                                            size="small"
                                            className={classes.textBox}
-                                           inputLabelProps={{classes: {root: classes.textBox}}}
+                                           //inputLabelProps={{classes: {root: classes.textBox}}}
                                            onChange={(event) => {
                                                setServingSize(event.target.value)
                                            }}/>}
@@ -296,46 +289,44 @@ export default function AddPintEntry(props) {
                        console.log('taste:', tasteRating)
                        console.log('sub by', submittedBy)
                        submitRating()
+                       props.close()
                    }}>Submit
           </Button>
         </DialogActions>
+          {
+              entrySuccessful ?
+                  null : null
+          }
       </Dialog>
   );
 }
 
-function Search(props){
+function SuccessMessage(){
 
-    const  classes = useStyles()
+    const [open, setOpen] = useState(true)
 
-    const {ready, value, suggestions: {status, data}, setValue, clearSuggestions} = usePlaceAutocomplete({
-        requestOptions: {location: {lat: () => 53.480759, lng: () => -2.242631}, // auto complete based on users location
-                        radius: 400}
-    })
-
-    const handleSelect = (address) => {
-        console.log(address)
-        console.log("here")
-        setValue(address, false);
-        clearSuggestions()
+    function Alert(props){
+        return <MuiAlert elevation={6} variant="filled" {...props}/>
     }
 
-    return <div>
-            <Combobox onSelect={handleSelect}
-            >
-                    <ComboboxInput value={value} onChange={(e) => {
-                        setValue(e.target.value)}}
-                        disabled={!ready}
-                        className={classes.searchVenue}
-                        placeholder=" Search Venue Name (Bar, Restaurant, Pub)"/>
-                    <ComboboxPopover>
-                        <ComboboxList style={{zIndex: 2000, position: 'absolute'}}
-                                    className={classes.dropDownVenues}>
-                            {   status === "OK" && data.map(({description}, index) => (
-                                <ComboboxOption key={index}
-                                                value={" " + description}><ComboboxOptionText/></ComboboxOption>))
-                            }
-                        </ComboboxList>
-                    </ComboboxPopover>
-                </Combobox>
-           </div>
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway'){
+            return;
+        }
+        setOpen(false)
+
+    }
+
+    return (
+        <div>
+            <Snackbar
+                open={open}
+                autoHideDuration={3000}
+                onClose={handleClose}>
+                <Alert severity="success" onClose={handleClose}>
+                    <Typography style={{fontWeight: 650}}>Pint Entry Added Successfully</Typography>
+                </Alert>
+            </Snackbar>
+        </div>
+    )
 }

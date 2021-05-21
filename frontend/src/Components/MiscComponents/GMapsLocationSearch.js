@@ -1,7 +1,6 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -49,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-export default function GoogleMapsSearch(props) {
+export default function GoogleMapsLocationSearch(props) {
   const classes = useStyles();
   const [value, setValue] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
@@ -115,16 +114,11 @@ export default function GoogleMapsSearch(props) {
         setValue(newValue);
         if(newValue){
             console.log(newValue)
-            console.log('location name', newValue.terms[0].value)
-            console.log('street', newValue.terms[1].value)
-            console.log('locality', newValue.terms[2].value)
-            console.log('placeid', newValue.place_id)
 
             const venue = {name: newValue.terms[0].value,
                            street: newValue.terms[1].value,
                            location: newValue.terms[2].value,
-                           googleMapsPlaceID: newValue.place_id
-            }
+                           googleMapsPlaceID: newValue.place_id}
             props.venueChosen(venue)
 
         }

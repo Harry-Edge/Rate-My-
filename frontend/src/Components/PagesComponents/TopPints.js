@@ -11,7 +11,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
-import styles from '../styles.module.css'
+import styles from '../../styles.module.css'
 import {Divider} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({

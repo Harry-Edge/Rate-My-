@@ -11,14 +11,10 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuList";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from '@material-ui/icons/Menu';
-import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
-import Grid from "@material-ui/core/Grid";
+import {Link} from "react-router-dom";
 import Box from '@material-ui/core/Box';
-import Home from "./Home";
-import TopPints from "./TopPints";
-import Venues from "./Venues";
-import About from "./About";
-import AddPintEntry from "./AddPintEntry";
+import AddPintEntry from "../PagesComponents/AddPintEntry";
+import SuccessMessage from "../MiscComponents/PintEntrySucessMessage";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -121,6 +117,7 @@ export default function Header() {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false)
+  const [pintEntryMade, setPintEntryMade] = useState(false)
 
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -150,7 +147,7 @@ export default function Header() {
               <SearchIcon />
             </div>
             <InputBase
-              placeholder="Search..."
+              placeholder="Search Ratings..."
               classes={{
                 root: classes.inputRoot,
                 input: classes.inputInput,
@@ -205,7 +202,11 @@ export default function Header() {
       </AppBar>
         {
                 open ?
-                    <AddPintEntry open={open} close={closeAddPint}/> : null
+                    <AddPintEntry open={open} close={closeAddPint} entryMade={setPintEntryMade}/> : null
+        }
+        {
+                    pintEntryMade ?
+                        <SuccessMessage/> : null
         }
     </div>
   );

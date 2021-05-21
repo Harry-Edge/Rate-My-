@@ -103,7 +103,14 @@ class SubmitBeerRating(APIView):
     def post(self, request):
 
         #serializer = RatingSerializer(data=request.data)
-        print(request.data)
+
+        """
+        sort out thing can be in lower can if manullay typed
+
+        or dont let a use have the option to type
+
+
+        """
 
         submitted_data = request.data
 
@@ -123,22 +130,24 @@ class SubmitBeerRating(APIView):
             else:
                 venue_object = venue_object[0]
 
+            if not submitted_data['submitted_by']:
+                submitted_data['submitted_by'] = "Anonymous User"
+
             rating_object = Rating.objects.create(beer=beer_object,
                                                   venue=venue_object,
                                                   serving_size=submitted_data['serving_size'],
                                                   price=float(submitted_data['price']),
                                                   value_for_money_rating=float(submitted_data['value_for_money_rating']),
                                                   atmosphere_rating=float(submitted_data['atmosphere_rating']),
-                                                  taste_rating=float(submitted_data['taste_rating']))
+                                                  taste_rating=float(submitted_data['taste_rating']),
+                                                  submitted_by=submitted_data['submitted_by'])
 
             print(rating_object)
-            print(venue_object)
             return Response("Pint Entry Added Successfully", status=status.HTTP_200_OK)
 
 
         else:
             return Response('Bad Request', status=status.HTTP_400_BAD_REQUEST)
-
 
 
         """

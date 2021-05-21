@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box'
 import Grid from "@material-ui/core/Grid";
 import {Divider, Paper} from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
 import SearchBar from "material-ui-search-bar";
 import TableContainer from "@material-ui/core/TableContainer";
 import Table from "@material-ui/core/Table";

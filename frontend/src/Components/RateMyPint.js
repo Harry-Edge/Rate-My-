@@ -1,15 +1,15 @@
 import '../App.css'
 import React, { useState } from 'react';
-import Header from "./Header";
-import MainNavigation from "./Navigation";
+import Header from "./NavComponents/Header";
+import MainNavigation from "./NavComponents/Navigation";
 import Box from '@material-ui/core/Box';
-import Home from "./Home";
-import TopPints from "./TopPints";
-import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom'
+import Home from "./PagesComponents/Home";
+import TopPints from "./PagesComponents/TopPints";
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 import {makeStyles} from "@material-ui/core/styles";
-import Venues from "./Venues";
-import About from "./About";
-import Footer from "./Footer";
+import Venues from "./PagesComponents/Venues";
+import About from "./PagesComponents/About";
+import Footer from "./NavComponents/Footer";
 import {useLoadScript} from "@react-google-maps/api";
 import Geocode from "react-geocode";
 
@@ -25,7 +25,7 @@ Geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
 
 function RateMyPint() {
   const [currentPage, setCurrentPage] = useState('home');
-  const classes = useStyles();
+  //const classes = useStyles();
 
 
   const {isLoaded} = useLoadScript(
