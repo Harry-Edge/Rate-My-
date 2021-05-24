@@ -14,7 +14,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import {Link} from "react-router-dom";
 import Box from '@material-ui/core/Box';
 import AddPintEntry from "../PagesComponents/AddPintEntry";
-import SuccessMessage from "../MiscComponents/PintEntrySucessMessage";
+import SuccessMessage from "../MiscComponents/SuccessMessagePopUp";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -147,6 +147,7 @@ export default function Header() {
               <SearchIcon />
             </div>
             <InputBase
+              onChange={(e) => console.log(e.target.value)}
               placeholder="Search Ratings..."
               classes={{
                 root: classes.inputRoot,
@@ -206,7 +207,7 @@ export default function Header() {
         }
         {
                     pintEntryMade ?
-                        <SuccessMessage/> : null
+                        <SuccessMessage message={"Pint Entry Added Successfully"}/> : null
         }
     </div>
   );

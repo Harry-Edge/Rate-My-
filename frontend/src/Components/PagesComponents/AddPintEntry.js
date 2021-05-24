@@ -9,7 +9,6 @@ import {Snackbar, TextField} from "@material-ui/core";
 import {Autocomplete} from "@material-ui/lab";
 import Typography from "@material-ui/core/Typography";
 import GoogleMapsSearch from "../MiscComponents/GMapsLocationSearch";
-import MuiAlert from '@material-ui/lab/Alert'
 
 const useStyles = makeStyles((theme) => ({
     title: {
@@ -84,8 +83,6 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const libraries = ['places']
-
 const beerServingSizes = [
     'Stein',
     'Pint',
@@ -102,7 +99,7 @@ export default function AddPintEntry(props) {
   const [breweryChosen, setBreweryChosen] = useState()
   const [venueChosen, setVenueChosen] = useState()
   const [priceChosen, setPriceChosen] = useState()
-  const [valueRating, setValueRating] = useState()
+  const [venueRating, setVenueRating] = useState()
   const [servingSize, setServingSize] = useState()
   const [atmosphereRating, setAtmosphereRating] = useState()
   const [tasteRating, setTasteRating] = useState()
@@ -110,11 +107,10 @@ export default function AddPintEntry(props) {
 
 
   const [priceValidationError, setPriceValidationError] = useState(false)
-  const [valueRatingValidationError, setValueRatingValidationError] = useState(false)
+  const [venueRatingValidationError, setVenueRatingValidationError] = useState(false)
   const [atmosphereRatingError, setAtmosphereRatingError] = useState(false)
   const [tasteRatingError, setTasteRatingError] = useState(false)
 
-  const [entrySuccessful, setEntrySuccessful] = useState(false)
 
   useEffect (() => {
         fetch("http://127.0.0.1:8000/api/get-beer-names")
@@ -133,17 +129,18 @@ export default function AddPintEntry(props) {
                                         venue: venueChosen,
                                         serving_size: servingSize,
                                         price: priceChosen,
-                                        value_for_money_rating: valueRating,
+                                        venue_rating: venueRating,
                                         atmosphere_rating: atmosphereRating,
                                         taste_rating: tasteRating,
-                                        submitted_by: submittedBy})
+                                        submitted_by: submittedBy ? submittedBy : "Anonymous User"})
       }
       fetch("http://127.0.0.1:8000/api/submit-rating", requestOptions)
          .then((response) => response.json())
          .then((data) => {
-             console.log(data)
-             //setEntrySuccessful(true)
-             props.entryMade(true)
+             if (data === "Pint Entry Added Successfully"){
+                 console.log(data)
+                 props.entryMade(true)
+             }
          })
   }
 
@@ -162,12 +159,12 @@ export default function AddPintEntry(props) {
           return false
       }
   }
-  function checkValueForMoneyIsValid(rating) {
+  function checkVenueRatingIsValid(rating) {
       if (checkRatingIsValid(rating)) {
-          setValueRating(rating)
-          setValueRatingValidationError(false)
+          setVenueRating(rating)
+          setVenueRatingValidationError(false)
       }else{
-          setValueRatingValidationError(true)
+          setVenueRatingValidationError(true)
       }
   }
   function checkAtmosphereRatingIsValid(rating){
@@ -199,10 +196,12 @@ export default function AddPintEntry(props) {
                              freeSolo
                              getOptionLabel={(option) => `${option.name} (${option.brewery})`}
                              onChange={(event, value) =>
-                                        {setBeerNameChosen(value.name)
+                                        {
+                                         if(value.name){
+                                             setBeerNameChosen(value.name)
+                                         }
                                          if (value.brewery) {
                                              setBreweryChosen(value.brewery)
-                                             console.log("here")
                                          }}}
                              renderInput={(parmas) => <
                                  TextField {...parmas} variant='outlined'
@@ -222,7 +221,7 @@ export default function AddPintEntry(props) {
                              onChange={(event, value) => setBreweryChosen(value.brewery)}
                              renderInput={(parmas) => <
                                  TextField {...parmas} variant='outlined'
-                                           label='Brewery'
+                                           label='Brewery (Leave Blank if Unknown)'
                                            size="small"
                                            className={classes.textBox}
                                            onChange={(event) => {
@@ -253,11 +252,11 @@ export default function AddPintEntry(props) {
                className={classes.textBox} label="Price (£)" variant="outlined" size="small"
                         onChange={(e) =>
                             checkPriceIsValid(e.target.value)}/>
-           <TextField className={classes.textBox} label="Value For Money (/10)" variant="outlined" size="small"
-                      error={valueRatingValidationError}
-                      helperText={valueRatingValidationError ? "Must be between 0-10" : null}
+           <TextField className={classes.textBox} label="Venue (/10)" variant="outlined" size="small"
+                      error={venueRatingValidationError}
+                      helperText={venueRatingValidationError ? "Must be between 0-10" : null}
                       onChange={(e) =>
-                                    checkValueForMoneyIsValid(e.target.value)}/>
+                                    checkVenueRatingIsValid(e.target.value)}/>
            <TextField className={classes.textBox} label="Atmosphere (/10)" variant="outlined" size="small"
                       error={atmosphereRatingError}
                       helperText={atmosphereRatingError ? "Must be between 0-10" : null}
@@ -279,54 +278,11 @@ export default function AddPintEntry(props) {
            <Button className={classes.submitButton}
                    variant='contained'
                    onClick={() => {
-                       console.log("beername", beerNameChosen)
-                       console.log("breweryname", breweryChosen)
-                       console.log('serving', servingSize)
-                       console.log("price", priceChosen)
-                       console.log("venue", venueChosen)
-                       console.log("value", valueRating)
-                       console.log('atmospg', atmosphereRating)
-                       console.log('taste:', tasteRating)
-                       console.log('sub by', submittedBy)
                        submitRating()
                        props.close()
                    }}>Submit
           </Button>
         </DialogActions>
-          {
-              entrySuccessful ?
-                  null : null
-          }
       </Dialog>
   );
-}
-
-function SuccessMessage(){
-
-    const [open, setOpen] = useState(true)
-
-    function Alert(props){
-        return <MuiAlert elevation={6} variant="filled" {...props}/>
-    }
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway'){
-            return;
-        }
-        setOpen(false)
-
-    }
-
-    return (
-        <div>
-            <Snackbar
-                open={open}
-                autoHideDuration={3000}
-                onClose={handleClose}>
-                <Alert severity="success" onClose={handleClose}>
-                    <Typography style={{fontWeight: 650}}>Pint Entry Added Successfully</Typography>
-                </Alert>
-            </Snackbar>
-        </div>
-    )
 }

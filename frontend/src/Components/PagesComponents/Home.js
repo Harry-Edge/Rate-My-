@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {Paper, Divider} from '@material-ui/core'
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid'
-import Box from '@material-ui/core/Box'
-import {GoogleMap} from "@react-google-maps/api";
-import {CircularProgress} from "@material-ui/core";
+import {Paper, CircularProgress, Divider, Typography, Grid, Box, } from '@material-ui/core'
+import ExploreIcon from '@material-ui/icons/Explore';
+import {GoogleMap, Marker, InfoWindow} from "@react-google-maps/api";
 import mapStyles from "../MiscComponents/mapStyles";
 import {ListItemSecondaryAction, ListItemText, ListItem, List} from "@material-ui/core";
-import ExploreIcon from '@material-ui/icons/Explore';
 import usePlaceAutocomplete, {getGeocode, getLatLng} from "use-places-autocomplete";
 import {Combobox, ComboboxInput, ComboboxPopover,
         ComboboxList, ComboboxOption, ComboboxOptionText} from "@reach/combobox";
@@ -62,6 +58,9 @@ const useStyles = makeStyles((theme) => ({
     dropDownVenues: {
         borderStyle: 'solid',
         borderColor: 'grey',
+        position: 'relative',
+        zIndex: 9999,
+        backgroundColor: 'white'
     },
 
 }));
@@ -73,6 +72,15 @@ export default function Home(props) {
 
   const [topRatedPintsInArea, setTopRatedPintsInArea] = useState()
   const [currentLocation, setCurrentLocation] = useState()
+  const [currentlySelectedVenue, setCurrentlySelectedVenue] = useState()
+  const [locations, setLocations] = useState()
+  const [showInfo, setShowInfo] = useState(true)
+
+  const [selected, setSelected] = useState({})
+  const onSelect = (item, index) => {
+      setSelected(item)
+      setShowInfo(index)
+  }
 
   const mapRef = React.useRef()
   const onMapLoad = React.useCallback((map) => {
@@ -123,7 +131,19 @@ export default function Home(props) {
          })
   }, [])
 
+  function plotLocations(data) {
+      let newArray = []
+      for (let key in data){
+          newArray.push({name: data[key].venue,
+                          location: {lat: parseFloat(data[key].lat),
+                                     lng: parseFloat(data[key].lng)}})
+
+      }
+      setLocations(newArray)
+  }
+
   function getTopRatedPints(location) {
+      setLocations(undefined)
       setTimeout(() => {
           //setCurrentLocation(location)
           const requestOptions = {
@@ -135,9 +155,12 @@ export default function Home(props) {
               .then((response) => response.json())
               .then((data) => {
                   setTopRatedPintsInArea(data)
+                  console.log(data)
+                  plotLocations(data)
               })
       }, 1)
     }
+
 
   const mapContainerStyle = {
       width: '100%',
@@ -152,6 +175,12 @@ export default function Home(props) {
       disableDefaultUI: true,
       zoomControl: true
   }
+
+  const position = {
+      lat: 53.480759,
+      lng: -2.242631
+  }
+
   return (
     <div className={classes.root}>
         {topRatedPintsInArea ?
@@ -164,7 +193,7 @@ export default function Home(props) {
                                               currentLocation={currentLocation}
                                               setCurrentLocation={setCurrentLocation}/>
                     </Grid>
-                    <Grid item lg={8} md={12} xs={12}>
+                    <Grid item lg={7} md={12} xs={12}>
                         <Locate panTo={panTo} getTopRatedPints={getTopRatedPints}
                                               currentLocation={currentLocation}
                                               setCurrentLocation={setCurrentLocation}/>
@@ -176,12 +205,53 @@ export default function Home(props) {
                                                    zoom={14}
                                                    options={options}
                                                    onLoad={onMapLoad}>
+                                            {
+                                                console.log(locations)
+                                            }
+                                            {
+                                                locations ?
+                                                locations.map((item, index) => (
+                                                    <Marker key={index}
+                                                            position={item.location}
+                                                            clickable={true}
+                                                            animation='drop'
+                                                            label={(index + 1).toString()}
+                                                            onClick={(e) =>
+                                                            {console.log(item)
+                                                             onSelect(item, index)}}
+                                                            >
+                                                        {
+                                                            showInfo === index &&  (<InfoWindow
+                                                        position={item.location}
+                                                        onCloseClick={() => setShowInfo()}>
+                                                        <div>
+                                                            <p>{item.name.name}</p>
+                                                            <p>({item.name.street})</p>
+                                                        </div>
+                                                    </InfoWindow>)
+                                                        }
+                                                    </Marker>
+                                                )): null
+                                            }
+                                            {
+                                                locations ?
+                                                locations.location && (
+                                                    <InfoWindow
+                                                        position={selected.location}
+                                                        clickable={true}
+                                                        onCloseClick={() => setSelected({})}>
+                                                        <p>{selected.name}</p>
+
+                                                    </InfoWindow>
+                                                ): null
+
+                                            }
                                         </GoogleMap> : null
                                 }
                             </div>
                         </Paper>
                     </Grid>
-                    <Grid item lg={4} md={12} xs={12}>
+                    <Grid item lg={5} md={12} xs={12}>
                         <Paper style={{height: '60vh',  border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
                             <Typography
                                 className={classes.topPintsAreaText}>
@@ -190,13 +260,15 @@ export default function Home(props) {
                                 {
                                     topRatedPintsInArea.length ?
                                         topRatedPintsInArea.map((entry, index) => {
-                                            const rankAndBeer = `${entry.rank}. ${entry.brewery} ${entry.beer}`
-                                            const venueAndLocation = `${entry.venue}, Price: £${entry.price}`
+                                            const rankAndBeer = `${entry.rank}. ${entry.beer} (${entry.brewery})`
+                                            const venueAndLocation = `${entry.venue.name}, Price: £${entry.price}, (${entry.ratings} Rating/s)`
                                             return (
-                                                <ListItem key={index} style={{height: 55}} button dense={true}>
+                                                <ListItem key={index} style={{height: 55}} button dense={true}
+                                                          style={showInfo === index ? {backgroundColor: '#f2f2f2'} : null }
+                                                          onClick={() => setShowInfo(index)}>
                                                     <ListItemText primary={rankAndBeer} secondary={venueAndLocation}/>
                                                     <ListItemSecondaryAction
-                                                        style={{fontWeight: 650}}>{entry.rating}/10</ListItemSecondaryAction>
+                                                        style={{fontWeight: 650}}>{entry.overall_rating}/10</ListItemSecondaryAction>
                                                 </ListItem>
                                             )
                                         }) : <Typography style={{display: 'flex', justifyContent: 'center'}}
@@ -207,7 +279,6 @@ export default function Home(props) {
                     </Grid>
                     <br/>
                 </Grid>
-
                 <br/>
                 <Divider/>
             </Box> :  <CircularProgress className={classes.progressLoader}/>
@@ -243,10 +314,11 @@ function Search(props){
 
     const handleSelect = async (address) => {
         setValue(address, false);
-        console.log("here")
         clearSuggestions()
         try {
+            console.log(address)
             const results = await getGeocode({address})
+            console.log(results)
             await props.setCurrentLocation(results[0].address_components[0].long_name)
             const {lat, lng} = await getLatLng(results[0])
             props.panTo({lat: lat, lng: lng, panLvl: 14})
@@ -273,3 +345,4 @@ function Search(props){
                 </Combobox>
            </div>
 }
+

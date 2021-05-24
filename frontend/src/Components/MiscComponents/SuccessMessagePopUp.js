@@ -3,7 +3,7 @@ import MuiAlert from "@material-ui/lab/Alert";
 import {Snackbar} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 
-export default function SuccessMessage(){
+export default function SuccessMessage(props){
 
     const [open, setOpen] = useState(true)
 
@@ -16,17 +16,16 @@ export default function SuccessMessage(){
             return;
         }
         setOpen(false)
-
     }
 
     return (
         <div>
             <Snackbar
                 open={open}
-                autoHideDuration={3000}
+                autoHideDuration={5000}
                 onClose={handleClose}>
                 <Alert severity="success" onClose={handleClose}>
-                    <Typography style={{fontWeight: 650}}>Pint Entry Added Successfully</Typography>
+                    <Typography style={{fontWeight: 650}}>{props.message}</Typography>
                 </Alert>
             </Snackbar>
         </div>

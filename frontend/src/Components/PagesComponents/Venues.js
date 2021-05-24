@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box'
 import Grid from "@material-ui/core/Grid";
-import {Divider, Paper} from "@material-ui/core";
+import {Divider, List, ListItem, ListItemSecondaryAction, ListItemText, Paper, Typography,} from "@material-ui/core";
 import SearchBar from "material-ui-search-bar";
 import TableContainer from "@material-ui/core/TableContainer";
 import Table from "@material-ui/core/Table";
@@ -11,11 +11,39 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
 
+
 const useStyles = makeStyles((theme) => ({
     resultsTable: {
         height: 600,
         overflow: 'scroll'
-    }
+    },
+    title: {
+        fontSize: 35,
+        fontWeight: 650,
+        color: 'grey',
+        paddingBottom: 20
+    },
+    boxesTitle: {
+        fontWeight: 650,
+        fontSize: 25
+    },
+    box: {
+        border: '1px',
+       borderStyle: 'solid',
+       borderColor: 'grey',
+    },
+    infoText: {
+        fontSize: 13,
+        fontWeight: 650
+    },
+    listItem: {
+        "& .MuiListItemText-primary": {
+            fontSize: 12
+        },
+         "& .MuiListItemText-secondary": {
+            fontSize: 12
+        },
+    },
 
 
 }));
@@ -24,6 +52,7 @@ export default function Venues() {
     const classes = useStyles()
 
     const [searchResults, setSearchResults] = useState([])
+    const [locationsData, setLocationsData] = useState()
 
     function search(searchTerm) {
       if(searchTerm ){
@@ -43,62 +72,124 @@ export default function Venues() {
       }
     }
 
+    useEffect(() => {
+       fetch("http://127.0.0.1:8000/api/get-most-popular-locations")
+             .then((response) => response.json())
+             .then((data) => {
+                 console.log(data)
+                 setLocationsData(data)
+             })
+    }, [])
+
+
+
   return (
     <div className={classes.root}>
-        <Box>
-            <Divider/>
-            <br/>
-            <Grid container>
-               <Grid item xs={12} md={12} lg={12}>
+        {locationsData ?
+            <Box>
+                <Divider/>
+                <br/>
+                <Grid container>
+                    <Grid item xs={12} md={12} lg={12}>
                         <SearchBar placeholder='Search Location or Venue'
-                                   style={{ border: '2px', borderStyle: 'solid', borderColor: 'grey'}}
+                                   style={{border: '2px', borderStyle: 'solid', borderColor: 'grey'}}
                                    onChange={(searchTerm) => search(searchTerm)}/>
+                    </Grid>
+                    <Grid style={{paddingTop: 20}} item xs={12} md={12} lg={12}>
+                        {searchResults.length ?
+                            <Paper style={{border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
+                            </Paper> : null
+                        }
+                    </Grid>
+                    <Grid item xs={12}><Typography className={classes.title}>Most Popular Locations</Typography></Grid>
+                    <Grid container spacing={2}>
+                        {
+                            locationsData.map((location, index) => {
+                                return (
+                                 <Grid key={index} item lg={4} md={4} sm={12}>
+                                    <Paper className={classes.box}>
+                                        <Box m={2}>
+                                            <Typography className={classes.boxesTitle}>{location.location}</Typography>
+                                            <Divider/>
+                                            <Grid container style={{paddingTop: 10}}>
+                                                <Grid item xs={4}>
+                                                    <Typography className={classes.infoText}>Total Beer Ratings</Typography>
+                                                    <Typography className={classes.infoText}
+                                                                style={{color: 'grey'}}>{location.total_ratings}</Typography>
+                                                </Grid>
+                                                <Grid item xs={8}>
+                                                    <Typography className={classes.infoText}>Most Popular Beer</Typography>
+                                                    <Typography className={classes.infoText}
+                                                                style={{color: 'grey'}}>{location.most_popular_beer.name}
+                                                                ({location.most_popular_beer.brewery})</Typography>
+
+                                                </Grid>
+                                                <Grid style={{paddingTop: 10}} xs={12}>
+                                                    <Typography style={{fontSize: 20}}>Popular Venues</Typography>
+                                                    <List dense={true}>
+                                                        <ListItem style={{height: 40}} dense={true}>
+                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
+                                                                          secondary="John Dalton"/>
+                                                            <ListItemSecondaryAction
+                                                                style={{fontWeight: 650, fontSize: 12}}>10
+                                                                Ratings</ListItemSecondaryAction>
+                                                        </ListItem>
+                                                        <ListItem style={{height: 40}} dense={true}>
+                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
+                                                                          secondary="John Dalton"/>
+                                                            <ListItemSecondaryAction
+                                                                style={{fontWeight: 650, fontSize: 12}}>10
+                                                                Ratings</ListItemSecondaryAction>
+                                                        </ListItem>
+                                                        <ListItem style={{height: 40}} dense={true}>
+                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
+                                                                          secondary="John Dalton"/>
+                                                            <ListItemSecondaryAction
+                                                                style={{fontWeight: 650, fontSize: 12}}>10
+                                                                Ratings</ListItemSecondaryAction>
+                                                        </ListItem>
+                                                    </List>
+                                                </Grid>
+                                                <Grid style={{paddingTop: 10}} xs={12}>
+                                                    <Typography style={{fontSize: 20}}>Top Rated Venues For Pints</Typography>
+                                                    <List dense={true}>
+                                                        <ListItem style={{height: 40}} dense={true}>
+                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
+                                                                          secondary="John Dalton"/>
+                                                            <ListItemSecondaryAction
+                                                                style={{fontWeight: 650, fontSize: 12}}>10
+                                                                Ratings</ListItemSecondaryAction>
+                                                        </ListItem>
+                                                        <ListItem style={{height: 40}} dense={true}>
+                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
+                                                                          secondary="John Dalton"/>
+                                                            <ListItemSecondaryAction
+                                                                style={{fontWeight: 650, fontSize: 12}}>10
+                                                                Ratings</ListItemSecondaryAction>
+                                                        </ListItem>
+                                                        <ListItem style={{height: 40}} dense={true}>
+                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
+                                                                          secondary="John Dalton"/>
+                                                            <ListItemSecondaryAction
+                                                                style={{fontWeight: 650, fontSize: 12}}>10
+                                                                Ratings</ListItemSecondaryAction>
+                                                        </ListItem>
+                                                    </List>
+                                                </Grid>
+                                            </Grid>
+                                            <br/>
+                                        </Box>
+                                    </Paper>
+                                </Grid>
+                                )
+                            })
+                        }
+                    </Grid>
                 </Grid>
-                <Grid style={{paddingTop: 20}} item xs={12} md={12} lg={12}>
-                    { searchResults.length ?
-                        <Paper style={{   border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
-                            <TableContainer component={Paper} className={classes.resultsTable}>
-                                <Table size='small'>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell className={classes.tableHeadText}>Rank</TableCell>
-                                            <TableCell className={classes.tableHeadText}>Brewery</TableCell>
-                                            <TableCell className={classes.tableHeadText}>Beer</TableCell>
-                                            <TableCell className={classes.tableHeadText}>Size</TableCell>
-                                            <TableCell className={classes.tableHeadText}>Average Price</TableCell>
-                                            <TableCell className={classes.tableHeadText}>Location</TableCell>
-                                            <TableCell className={classes.tableHeadText}>Venue</TableCell>
-                                            <TableCell className={classes.tableHeadText} align="right">Overall User
-                                                Rating</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {
-                                            searchResults.map((pintEntry, index) => {
-                                                return (
-                                                    <TableRow hover={true} key={index}>
-                                                        <TableCell>{pintEntry.rank}</TableCell>
-                                                        <TableCell>{pintEntry.brewery}</TableCell>
-                                                        <TableCell>{pintEntry.beer}</TableCell>
-                                                        <TableCell>Pint</TableCell>
-                                                        <TableCell>£{pintEntry.price}</TableCell>
-                                                        <TableCell>{pintEntry.location}</TableCell>
-                                                        <TableCell>{pintEntry.venue}</TableCell>
-                                                        <TableCell align="right">{pintEntry.rating}/10</TableCell>
-                                                    </TableRow>
-                                                )
-                                            })
-                                        }
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Paper> : null
-                    }
-                </Grid>
-            </Grid>
-            <br/>
-            <Divider/>
-        </Box>
+                <br/>
+                <Divider/>
+            </Box> : null
+        }
     </div>
   );
 }

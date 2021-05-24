@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
+import {getGeocode, getLatLng} from "use-places-autocomplete";
 
 const autocompleteService = { current: null };
 
@@ -62,6 +63,30 @@ export default function GoogleMapsLocationSearch(props) {
     [],
   );
 
+
+  const selectLocation = async (address, newValue) => {
+        try {
+            console.log(address)
+            const results = await getGeocode({address})
+            console.log(results)
+            const {lat, lng} = await getLatLng(results[0])
+
+            const venue = {name: newValue.terms[0].value,
+                           street: newValue.terms[1].value,
+                           location: newValue.terms[2].value,
+                           googleMapsPlaceID: newValue.place_id,
+                            latitude: lat,
+                            longitude: lng
+
+                            }
+            console.log(venue)
+            props.venueChosen(venue)
+        }catch (error){
+            console.log("Error:", error)
+        }
+    }
+
+
   React.useEffect(() => {
     let active = true;
 
@@ -113,14 +138,7 @@ export default function GoogleMapsLocationSearch(props) {
         setOptions(newValue ? [newValue, ...options] : options);
         setValue(newValue);
         if(newValue){
-            console.log(newValue)
-
-            const venue = {name: newValue.terms[0].value,
-                           street: newValue.terms[1].value,
-                           location: newValue.terms[2].value,
-                           googleMapsPlaceID: newValue.place_id}
-            props.venueChosen(venue)
-
+            selectLocation(newValue.description, newValue)
         }
 
       }}

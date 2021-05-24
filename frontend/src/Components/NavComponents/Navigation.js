@@ -5,7 +5,7 @@ import Box from '@material-ui/core/Box'
 import Button from '@material-ui/core/Button'
 import {Link} from 'react-router-dom'
 import AddPintEntry from "../PagesComponents/AddPintEntry";
-import SuccessMessage from "../MiscComponents/PintEntrySucessMessage";
+import SuccessMessage from "../MiscComponents/SuccessMessagePopUp";
 
 const useStyles = makeStyles((theme) => ({
     navMenuItemsText: {
@@ -105,7 +105,7 @@ export default function MainNavigation() {
                 }
                 {
                     pintEntryMade ?
-                        <SuccessMessage/> : null
+                        <SuccessMessage message={"Pint Entry Added Successfully"}/> : null
                 }
 
             </div>

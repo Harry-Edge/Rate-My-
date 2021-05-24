@@ -1,18 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper'
-import Grid from '@material-ui/core/Grid';
 import SearchBar from "material-ui-search-bar";
-import Box from '@material-ui/core/Box'
-import TableContainer from "@material-ui/core/TableContainer";
-import CircularProgress from '@material-ui/core/CircularProgress'
-import Table from "@material-ui/core/Table";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableBody from "@material-ui/core/TableBody";
+import {TableBody, TableCell, TableRow, TableHead, Table, CircularProgress, TableContainer,
+        Box, Grid, Paper} from "@material-ui/core/";
+
 import styles from '../../styles.module.css'
-import {Divider} from "@material-ui/core";
+import {Divider, List, ListItem, ListItemSecondaryAction, ListItemText, Typography} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
     tableHeadText: {
@@ -25,12 +18,39 @@ const useStyles = makeStyles((theme) => ({
        marginLeft: '45%'
   },
    table: {
+       height: 550,
+       overflow: 'scroll',
+       border: '1px',
+       borderStyle: 'solid',
+       borderColor: 'grey',
+       display: 'none',
+        [theme.breakpoints.up('md')]: {
+              display: 'block',}
+   },
+   topPintsTable: {
        height: 600,
        overflow: 'scroll',
-       border: '2px',
+       border: '1px',
        borderStyle: 'solid',
-       borderColor: 'grey'
-   }
+       borderColor: 'grey',
+    },
+    listItem: {
+        "& .MuiListItemText-primary": {
+            fontSize: 12
+        },
+         "& .MuiListItemText-secondary": {
+            fontSize: 12
+        },
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 650,
+        display: 'flex',
+        color: 'grey',
+        justifyContent: 'center',
+        paddingBottom: 15
+    },
+
 
 }));
 
@@ -73,20 +93,26 @@ export default function TopPints() {
                     //</Grid>
                     }
                     <Grid style={{paddingTop: 20}} item xs={12} md={12} lg={12}>
+                        <Grid>
+                            <Typography className={classes.title}>Top Pints in the UK, as Rated By You</Typography>
+                        </Grid>
                         <Paper>
                             <TableContainer component={Paper} className={classes.table}>
                                 <Table size='small'>
                                     <TableHead>
                                         <TableRow>
                                             <TableCell className={classes.tableHeadText}>Rank</TableCell>
-                                            <TableCell className={classes.tableHeadText}>Brewery</TableCell>
                                             <TableCell className={classes.tableHeadText}>Beer</TableCell>
                                             <TableCell className={classes.tableHeadText}>Size</TableCell>
-                                            <TableCell className={classes.tableHeadText}>Average Price</TableCell>
+                                            <TableCell className={classes.tableHeadText}>Price</TableCell>
                                             <TableCell className={classes.tableHeadText}>Location</TableCell>
                                             <TableCell className={classes.tableHeadText}>Venue</TableCell>
-                                            <TableCell className={classes.tableHeadText} align="right">Overall User
-                                                Rating</TableCell>
+                                            <TableCell className={classes.tableHeadText}>Ratings</TableCell>
+                                            <TableCell className={classes.tableHeadText}>Venue</TableCell>
+                                            <TableCell className={classes.tableHeadText}>Atmosphere</TableCell>
+                                            <TableCell className={classes.tableHeadText}>Taste</TableCell>
+                                            <TableCell className={classes.tableHeadText} align="right">
+                                                            Overall</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -94,14 +120,19 @@ export default function TopPints() {
                                                 topPintsList.map((pintEntry, index) => {
                                                     return (
                                                         <TableRow hover={true} key={index}>
+
                                                             <TableCell>{pintEntry.rank}</TableCell>
-                                                            <TableCell>{pintEntry.brewery}</TableCell>
-                                                            <TableCell>{pintEntry.beer}</TableCell>
+                                                            <TableCell>{pintEntry.beer} ({pintEntry.brewery})</TableCell>
                                                             <TableCell>Pint</TableCell>
                                                             <TableCell>£{pintEntry.price}</TableCell>
                                                             <TableCell>{pintEntry.location}</TableCell>
-                                                            <TableCell>{pintEntry.venue}</TableCell>
-                                                            <TableCell align="right">{pintEntry.rating}/10</TableCell>
+                                                            <TableCell>{pintEntry.venue.name}</TableCell>
+                                                            <TableCell>{pintEntry.ratings}</TableCell>
+                                                            <TableCell>{pintEntry.atmosphere_rating}/10</TableCell>
+                                                            <TableCell>{pintEntry.atmosphere_rating}/10</TableCell>
+                                                            <TableCell>{pintEntry.taste_rating}/10</TableCell>
+                                                            <TableCell align="right" style={{fontWeight: 650}}>
+                                                                       {pintEntry.overall_rating}/10</TableCell>
                                                         </TableRow>
                                                     )
                                                 })
@@ -109,6 +140,24 @@ export default function TopPints() {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
+                            <Box display={{md: 'none' }}>
+                                  <List dense={true} className={classes.topPintsTable}>
+                                {
+                                        topPintsList.map((entry, index) => {
+                                            const rankAndBeer = `${entry.rank}. ${entry.beer} (${entry.brewery})`
+                                            const venueAndLocation = `${entry.venue.name}(${entry.location}), Price: £${entry.price}, (${entry.ratings} Rating/s)`
+                                            return (
+                                                <ListItem key={index} style={{height: 55}} dense={true}>
+                                                    <ListItemText className={classes.listItem} primary={rankAndBeer} secondary={venueAndLocation}/>
+                                                    <ListItemSecondaryAction
+                                                        style={{fontWeight: 650, fontSize: 12}}>{entry.overall_rating}/10</ListItemSecondaryAction>
+                                                </ListItem>
+                                            )
+                                        })
+                                }
+                                </List>
+                            </Box>
+
                         </Paper>
                     </Grid>
                     <br/>
