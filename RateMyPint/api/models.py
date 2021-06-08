@@ -30,8 +30,6 @@ class Rating(models.Model):
 
     SERVING_SIZES = [('Pint', 'Pint'), ('Schooner', 'Schooner'), ('Half-Pint', 'Half-Pint'), ('1/3 Pint', '1/3 Pint')]
 
-
-    """ TRiple check hte on delete shit """
     beer = models.ForeignKey(Beer, null=True, on_delete=models.CASCADE)
     venue = models.ForeignKey(Venue, null=True, on_delete=models.CASCADE)
     serving_size = models.CharField(null=True, choices=SERVING_SIZES, max_length=10)

@@ -2,7 +2,8 @@ import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box'
 import Grid from "@material-ui/core/Grid";
-import {Divider, List, ListItem, ListItemSecondaryAction, ListItemText, Paper, Typography,} from "@material-ui/core";
+import {Divider, List, ListItem, ListItemSecondaryAction, ListItemText, Paper, Typography,
+        CircularProgress} from "@material-ui/core";
 import SearchBar from "material-ui-search-bar";
 import TableContainer from "@material-ui/core/TableContainer";
 import Table from "@material-ui/core/Table";
@@ -10,6 +11,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import TableBody from "@material-ui/core/TableBody";
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -44,8 +46,12 @@ const useStyles = makeStyles((theme) => ({
             fontSize: 12
         },
     },
-
-
+    progressLoader: {
+       color: '#e68a00',
+       position: 'relative',
+       marginTop: '20px',
+       marginLeft: '45%'
+    },
 }));
 
 export default function Venues() {
@@ -81,8 +87,6 @@ export default function Venues() {
              })
     }, [])
 
-
-
   return (
     <div className={classes.root}>
         {locationsData ?
@@ -90,17 +94,19 @@ export default function Venues() {
                 <Divider/>
                 <br/>
                 <Grid container>
-                    <Grid item xs={12} md={12} lg={12}>
-                        <SearchBar placeholder='Search Location or Venue'
-                                   style={{border: '2px', borderStyle: 'solid', borderColor: 'grey'}}
-                                   onChange={(searchTerm) => search(searchTerm)}/>
-                    </Grid>
-                    <Grid style={{paddingTop: 20}} item xs={12} md={12} lg={12}>
-                        {searchResults.length ?
-                            <Paper style={{border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
-                            </Paper> : null
-                        }
-                    </Grid>
+                    { /*
+                        <Grid item xs={12} md={12} lg={12}>
+                            <SearchBar placeholder='Search Location or Venue'
+                                       style={{border: '2px', borderStyle: 'solid', borderColor: 'grey'}}
+                                       onChange={(searchTerm) => search(searchTerm)}/>
+                        </Grid>
+                        <Grid style={{paddingTop: 20}} item xs={12} md={12} lg={12}>
+                    {searchResults.length ?
+                        <Paper style={{border: '2px', borderStyle: 'solid', borderColor: 'grey'}}>
+                        </Paper> : null
+                    }
+                        </Grid> */
+                    }
                     <Grid item xs={12}><Typography className={classes.title}>Most Popular Locations</Typography></Grid>
                     <Grid container spacing={2}>
                         {
@@ -127,57 +133,39 @@ export default function Venues() {
                                                 <Grid style={{paddingTop: 10}} xs={12}>
                                                     <Typography style={{fontSize: 20}}>Popular Venues</Typography>
                                                     <List dense={true}>
-                                                        <ListItem style={{height: 40}} dense={true}>
-                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
-                                                                          secondary="John Dalton"/>
-                                                            <ListItemSecondaryAction
-                                                                style={{fontWeight: 650, fontSize: 12}}>10
-                                                                Ratings</ListItemSecondaryAction>
-                                                        </ListItem>
-                                                        <ListItem style={{height: 40}} dense={true}>
-                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
-                                                                          secondary="John Dalton"/>
-                                                            <ListItemSecondaryAction
-                                                                style={{fontWeight: 650, fontSize: 12}}>10
-                                                                Ratings</ListItemSecondaryAction>
-                                                        </ListItem>
-                                                        <ListItem style={{height: 40}} dense={true}>
-                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
-                                                                          secondary="John Dalton"/>
-                                                            <ListItemSecondaryAction
-                                                                style={{fontWeight: 650, fontSize: 12}}>10
-                                                                Ratings</ListItemSecondaryAction>
-                                                        </ListItem>
+                                                        {
+                                                            location.most_popular_venues.map((venue, index) => {
+                                                                return (
+                                                                 <ListItem key={index} style={{height: 40}} dense={true}>
+                                                                    <ListItemText className={classes.listItem} primary={venue.name}
+                                                                                  secondary={venue.street}/>
+                                                                    <ListItemSecondaryAction
+                                                                        style={{fontWeight: 650, fontSize: 12}}>{venue.ratings} Ratings
+                                                                    </ListItemSecondaryAction>
+                                                                </ListItem>
+                                                                )
+                                                            })
+                                                        }
                                                     </List>
                                                 </Grid>
                                                 <Grid style={{paddingTop: 10}} xs={12}>
                                                     <Typography style={{fontSize: 20}}>Top Rated Venues For Pints</Typography>
                                                     <List dense={true}>
-                                                        <ListItem style={{height: 40}} dense={true}>
-                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
-                                                                          secondary="John Dalton"/>
-                                                            <ListItemSecondaryAction
-                                                                style={{fontWeight: 650, fontSize: 12}}>10
-                                                                Ratings</ListItemSecondaryAction>
-                                                        </ListItem>
-                                                        <ListItem style={{height: 40}} dense={true}>
-                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
-                                                                          secondary="John Dalton"/>
-                                                            <ListItemSecondaryAction
-                                                                style={{fontWeight: 650, fontSize: 12}}>10
-                                                                Ratings</ListItemSecondaryAction>
-                                                        </ListItem>
-                                                        <ListItem style={{height: 40}} dense={true}>
-                                                            <ListItemText className={classes.listItem} primary="Ape and Apple"
-                                                                          secondary="John Dalton"/>
-                                                            <ListItemSecondaryAction
-                                                                style={{fontWeight: 650, fontSize: 12}}>10
-                                                                Ratings</ListItemSecondaryAction>
-                                                        </ListItem>
+                                                        {
+                                                            location.top_rated_venues_for_pints.map((venue, index) => {
+                                                                return (
+                                                                   <ListItem style={{height: 40}} dense={true}>
+                                                                        <ListItemText className={classes.listItem} primary={venue.name}
+                                                                                      secondary={venue.street}/>
+                                                                        <ListItemSecondaryAction
+                                                                            style={{fontWeight: 650, fontSize: 12}}>{venue.average_pint_rating} Ratings</ListItemSecondaryAction>
+                                                                   </ListItem>
+                                                                )
+                                                            })
+                                                        }
                                                     </List>
                                                 </Grid>
                                             </Grid>
-                                            <br/>
                                         </Box>
                                     </Paper>
                                 </Grid>
@@ -188,7 +176,7 @@ export default function Venues() {
                 </Grid>
                 <br/>
                 <Divider/>
-            </Box> : null
+            </Box> : <CircularProgress className={classes.progressLoader} />
         }
     </div>
   );

@@ -7,6 +7,7 @@ from django.db.models import Q
 from .models import *
 from .serializers import *
 import time
+from django.db.models import Count
 
 delay_local_host_server_time = 0.25
 
@@ -125,64 +126,92 @@ class SearchLocations(APIView):
 class GetMostPopularLocations(APIView):
     permission_classes = (AllowAny, )
 
-
     def get(self, request):
 
-        """
-        1. get total ratings of a city
-        2. get most popular beer of the given city
-        3. get most popular venues by amount of ratings
-        4. get the venues which have the best rated pints
-
-        5. Find the most popular location
-
-        """
         locations = ['Manchester', 'Salford', 'Manchester']
 
-        data1 = []
+        class GetMostPopularLocationAndVenueData:
+            def __init__(self, location):
+                self.location = location
 
-        def get_location_data():
-            for location in locations:
-                data_dic = {}
+            def find_most_popular_beer(self):
+                popular_beer = Rating.objects.filter(venue__location=self.location)
 
-                # Adds location to dic
-                data_dic['location'] = location
-                # Adds total pints ratings to dic
-                data_dic['total_ratings'] = Rating.objects.filter(venue__location=location).order_by('-overall_rating').count()
+                def most_frequent(list):
+                    counter = 0
+                    num = list[0]
+                    for i in list:
+                        curr_frequency = list.count(i)
+                        if curr_frequency > counter:
+                            counter = curr_frequency
+                            num = i
+                    return num
 
-                def find_most_popular_beer():
-                    popular_beer = Rating.objects.filter(venue__location=location)
-                    def most_frequent(list):
-                        counter = 0
-                        num = list[0]
-                        for i in list:
-                            curr_frequency = list.count(i)
-                            if curr_frequency > counter:
-                                counter = curr_frequency
-                                num = i
-                        return num
+                all_beer_id_list = []
+                for i in popular_beer:
+                    all_beer_id_list.append(i.beer.id)
+                all_beer_id_list.sort()
+                most_pop = Beer.objects.get(id=most_frequent(all_beer_id_list))
 
-                    all_beer_id_list = []
-                    for i in popular_beer:
-                        all_beer_id_list.append(i.beer.id)
-                    all_beer_id_list.sort()
-                    return Beer.objects.get(id=most_frequent(all_beer_id_list))
+                return {'name': most_pop.name, 'brewery': most_pop.brewery}
 
-                def find_most_popular_venues():
-                    venues = Rating.objects.filter(venue__location=location)
-                    for i in venues:
-                        print(i.venue)
-                find_most_popular_venues()
+            def find_most_popular_venues(self):
+                venue_list = []
 
+                top_venues = Venue.objects.filter(location=self.location) \
+                                 .annotate(num_ratings=Count('rating')).order_by('-num_ratings')[:3]
+                for venue in top_venues:
+                    amount_of_ratings = Rating.objects.filter(venue=venue).count()
+                    dic = {'name': venue.name, 'street': venue.street, 'ratings': amount_of_ratings}
+                    venue_list.append(dic)
 
+                return venue_list
 
-                most_popular_beer = find_most_popular_beer()
-                data_dic['most_popular_beer'] = {'name': most_popular_beer.name, 'brewery': most_popular_beer.brewery}
-                data1.append(data_dic)
-        get_location_data()
+            def find_top_rated_venues_for_pints(self):
+                all_ratings_for_location = Rating.objects.filter \
+                    (venue__location=self.location).order_by('-overall_rating')
+                repeat_done_venues_ids = []
+                top_rated_venue_list = []
 
-        print(data1)
-        return Response(data1, status=status.HTTP_200_OK)
+                for rating in all_ratings_for_location:
+                    if not rating.venue.id in repeat_done_venues_ids:
+                        total_ratings_value = 0
+                        count = 0
+                        for i in Rating.objects.filter(venue__id=rating.venue.id):
+                            if type(i.overall_rating) is float:
+                                total_ratings_value += i.overall_rating
+                                count += 1
+                        if total_ratings_value:
+                            average_rating = round((total_ratings_value / count), 2)
+                            dic = {'name': rating.venue.name, 'street': rating.venue.street,
+                                   'average_pint_rating': average_rating}
+                            top_rated_venue_list.append(dic)
+                        repeat_done_venues_ids.append(rating.venue.id)
+                    continue
+                top_rated_venue_list.sort(key=lambda x: x['average_pint_rating'], reverse=True)
+                return top_rated_venue_list[:3]
+
+            def get_total_ratings_for_location(self):
+
+                return Rating.objects.filter(venue__location=self.location).order_by('-overall_rating').count()
+
+            def return_all_location_data(self):
+
+                return {
+                    'location' : self.location,
+                    'total_ratings': self.get_total_ratings_for_location(),
+                    'most_popular_beer': self.find_most_popular_beer(),
+                    'most_popular_venues': self.find_most_popular_venues(),
+                    'top_rated_venues_for_pints': self.find_top_rated_venues_for_pints()
+                }
+
+        all_location_data = []
+
+        for location in locations:
+            get_data = GetMostPopularLocationAndVenueData(location)
+            all_location_data.append(get_data.return_all_location_data())
+
+        return Response(all_location_data, status=status.HTTP_200_OK)
 
 
 class GetBeerNames(APIView):

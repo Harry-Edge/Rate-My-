@@ -91,9 +91,10 @@ export default function Home(props) {
       setTimeout(() => {
                 mapRef.current.panTo({lat, lng})
                 mapRef.current.setZoom(panLvl)
-      }, 300)
+      }, 5000)
 
     }, [])
+
 
 
   useEffect( async () => {
