@@ -9,11 +9,11 @@ Users can also see the top-rated pints that all users have submitted based on th
 
 The app is fully optimised for mobile and all other screen sizes, users can also submit Bug Reports and feedback using the link in the footer. 
 
-This code is a pre-deployment build of Rate My Pint. The production version uses PostgreSQL as its database which is hosted on AWS RDS. Both the backend and frontend are hosted on Heroku. 
+This code is a pre-deployment build of Rate My Pint. The production version has updated code and design but is private due to api keys, it also uses PostgreSQL as its database which is hosted on AWS RDS. Both the backend and frontend are hosted on Heroku.
 
 www.Ratemypint.co.uk
 
-Build with Django REST Framework, React,  Material-UI, Google Maps API, Google Places API, Heroku, AWS, PostgreSQL
+Build with Django REST Framework, React, Material-UI, Google Maps API, Google Places API, Heroku, AWS, PostgreSQL
 
 ## Home
 ![](/sampleimages/home.jpeg?raw=true "Home")
